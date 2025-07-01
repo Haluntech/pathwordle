@@ -1,11 +1,25 @@
 import { GridCell, GuessResult } from '../types/game';
-import { getDailyWord, isValidWord } from './wordList';
+import { getDailyWord, getPracticeWord, isValidWord } from './wordList';
 
 const GRID_SIZE = 6;
 const WORD_LENGTH = 5;
 
-export const createGrid = (targetWord: string): GridCell[][] => {
+export const createGrid = (targetWord: string, seed?: string): GridCell[][] => {
   const grid: GridCell[][] = [];
+  
+  // Use seed for more randomization if provided
+  let random = Math.random;
+  if (seed) {
+    let seedValue = 0;
+    for (let i = 0; i < seed.length; i++) {
+      seedValue += seed.charCodeAt(i);
+    }
+    seedValue = (seedValue * 9301 + 49297) % 233280;
+    random = () => {
+      seedValue = (seedValue * 9301 + 49297) % 233280;
+      return seedValue / 233280;
+    };
+  }
   
   // Initialize empty grid
   for (let row = 0; row < GRID_SIZE; row++) {
@@ -23,19 +37,24 @@ export const createGrid = (targetWord: string): GridCell[][] => {
   }
 
   // Place target word in a valid path
-  const path = generateValidPath();
+  const path = generateValidPath(random);
   for (let i = 0; i < targetWord.length; i++) {
     const cell = path[i];
     grid[cell.row][cell.col].letter = targetWord[i];
   }
 
-  // Fill remaining cells with random letters
-  const commonLetters = 'AEIOURSTLNBCDFGHJKMPQVWXYZ';
+  // Fill remaining cells with random letters - improved distribution
+  const vowels = 'AEIOU';
+  const consonants = 'BCDFGHJKLMNPQRSTVWXYZ';
+  
   for (let row = 0; row < GRID_SIZE; row++) {
     for (let col = 0; col < GRID_SIZE; col++) {
       if (!grid[row][col].letter) {
-        const randomIndex = Math.floor(Math.random() * commonLetters.length);
-        grid[row][col].letter = commonLetters[randomIndex];
+        // Better letter distribution: 40% vowels, 60% consonants
+        const useVowel = random() < 0.4;
+        const letters = useVowel ? vowels : consonants;
+        const randomIndex = Math.floor(random() * letters.length);
+        grid[row][col].letter = letters[randomIndex];
       }
     }
   }
@@ -43,10 +62,10 @@ export const createGrid = (targetWord: string): GridCell[][] => {
   return grid;
 };
 
-const generateValidPath = (): { row: number; col: number }[] => {
+const generateValidPath = (random = Math.random): { row: number; col: number }[] => {
   const path = [];
-  let row = Math.floor(Math.random() * GRID_SIZE);
-  let col = Math.floor(Math.random() * GRID_SIZE);
+  let row = Math.floor(random() * GRID_SIZE);
+  let col = Math.floor(random() * GRID_SIZE);
   
   path.push({ row, col });
   
@@ -54,10 +73,10 @@ const generateValidPath = (): { row: number; col: number }[] => {
     const neighbors = getNeighbors(row, col, path);
     if (neighbors.length === 0) {
       // Restart if we can't continue
-      return generateValidPath();
+      return generateValidPath(random);
     }
     
-    const nextCell = neighbors[Math.floor(Math.random() * neighbors.length)];
+    const nextCell = neighbors[Math.floor(random() * neighbors.length)];
     row = nextCell.row;
     col = nextCell.col;
     path.push({ row, col });
@@ -146,4 +165,8 @@ export const getTodaysDate = (): string => {
 
 export const getTodaysWord = (): string => {
   return getDailyWord(getTodaysDate());
+};
+
+export const getPracticeGameWord = (): string => {
+  return getPracticeWord();
 };

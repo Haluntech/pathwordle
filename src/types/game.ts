@@ -15,6 +15,7 @@ export interface GameState {
   attemptsLeft: number;
   gameStatus: 'playing' | 'won' | 'lost';
   currentDate: string;
+  gameMode: 'daily' | 'practice';
 }
 
 export interface GuessResult {

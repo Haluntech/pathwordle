@@ -7,27 +7,32 @@ import {
   isValidPath, 
   getTodaysDate, 
   getTodaysWord,
+  getPracticeGameWord,
   areAdjacent 
 } from '../utils/gameLogic';
 
 const STORAGE_KEY = 'pathwordle-game';
 const MAX_ATTEMPTS = 6;
 
-export const usePathWordle = () => {
+export const usePathWordle = (gameMode: 'daily' | 'practice' = 'daily') => {
   const [gameState, setGameState] = useState<GameState>(() => {
     const today = getTodaysDate();
-    const savedGame = localStorage.getItem(STORAGE_KEY);
     
-    if (savedGame) {
-      const parsed = JSON.parse(savedGame);
-      if (parsed.currentDate === today) {
-        return parsed;
+    if (gameMode === 'daily') {
+      const savedGame = localStorage.getItem(STORAGE_KEY);
+      
+      if (savedGame) {
+        const parsed = JSON.parse(savedGame);
+        if (parsed.currentDate === today && parsed.gameMode === 'daily') {
+          return parsed;
+        }
       }
     }
     
     // Create new game
-    const targetWord = getTodaysWord();
-    const grid = createGrid(targetWord);
+    const targetWord = gameMode === 'daily' ? getTodaysWord() : getPracticeGameWord();
+    const gridSeed = gameMode === 'daily' ? today : undefined;
+    const grid = createGrid(targetWord, gridSeed);
     
     return {
       grid,
@@ -36,7 +41,8 @@ export const usePathWordle = () => {
       guesses: [],
       attemptsLeft: MAX_ATTEMPTS,
       gameStatus: 'playing' as const,
-      currentDate: today
+      currentDate: today,
+      gameMode
     };
   });
 
@@ -45,7 +51,10 @@ export const usePathWordle = () => {
   }, []);
 
   useEffect(() => {
-    saveGame(gameState);
+    // Only save daily games
+    if (gameState.gameMode === 'daily') {
+      saveGame(gameState);
+    }
   }, [gameState, saveGame]);
 
   const updateGrid = useCallback((updater: (grid: GridCell[][]) => GridCell[][]) => {
@@ -219,8 +228,9 @@ export const usePathWordle = () => {
 
   const resetGame = useCallback(() => {
     const today = getTodaysDate();
-    const targetWord = getTodaysWord();
-    const grid = createGrid(targetWord);
+    const targetWord = gameMode === 'daily' ? getTodaysWord() : getPracticeGameWord();
+    const gridSeed = gameMode === 'daily' ? today : undefined;
+    const grid = createGrid(targetWord, gridSeed);
     
     const newState: GameState = {
       grid,
@@ -229,12 +239,15 @@ export const usePathWordle = () => {
       guesses: [],
       attemptsLeft: MAX_ATTEMPTS,
       gameStatus: 'playing',
-      currentDate: today
+      currentDate: today,
+      gameMode
     };
     
     setGameState(newState);
-    localStorage.removeItem(STORAGE_KEY);
-  }, []);
+    if (gameMode === 'daily') {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [gameMode]);
 
   return {
     gameState,

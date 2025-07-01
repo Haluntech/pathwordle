@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trophy, X, RotateCcw } from 'lucide-react';
 
 interface GameResultProps {
@@ -6,19 +6,80 @@ interface GameResultProps {
   targetWord: string;
   attemptsUsed: number;
   onReset: () => void;
+  gameMode?: 'daily' | 'practice';
+}
+
+interface Confetti {
+  id: number;
+  x: number;
+  y: number;
+  rotation: number;
+  color: string;
+  delay: number;
 }
 
 const GameResult: React.FC<GameResultProps> = ({
   gameStatus,
   targetWord,
   attemptsUsed,
-  onReset
+  onReset,
+  gameMode = 'daily'
 }) => {
   const isWon = gameStatus === 'won';
+  const [confetti, setConfetti] = useState<Confetti[]>([]);
+  const [showAnimation, setShowAnimation] = useState(false);
+
+  useEffect(() => {
+    if (isWon) {
+      setShowAnimation(true);
+      // Generate confetti pieces
+      const pieces: Confetti[] = [];
+      const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+      
+      for (let i = 0; i < 50; i++) {
+        pieces.push({
+          id: i,
+          x: Math.random() * 100,
+          y: -10,
+          rotation: Math.random() * 360,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          delay: Math.random() * 3
+        });
+      }
+      
+      setConfetti(pieces);
+      
+      // Stop animation after 4 seconds
+      const timer = setTimeout(() => {
+        setShowAnimation(false);
+        setConfetti([]);
+      }, 4000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isWon]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 text-center">
+      {/* Confetti Animation */}
+      {showAnimation && (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-40">
+          {confetti.map((piece) => (
+            <div
+              key={piece.id}
+              className="absolute w-3 h-3 opacity-90"
+              style={{
+                left: `${piece.x}%`,
+                backgroundColor: piece.color,
+                transform: `rotate(${piece.rotation}deg)`,
+                animation: `confetti-fall 3s linear ${piece.delay}s forwards`
+              }}
+            />
+          ))}
+        </div>
+      )}
+      
+      <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 text-center relative z-50">
         <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${
           isWon ? 'bg-green-100' : 'bg-red-100'
         }`}>
@@ -58,7 +119,7 @@ const GameResult: React.FC<GameResultProps> = ({
           "
         >
           <RotateCcw size={16} />
-          Play Again Tomorrow
+          {gameMode === 'practice' ? 'Play Again' : 'Play Again Tomorrow'}
         </button>
       </div>
     </div>

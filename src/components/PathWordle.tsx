@@ -6,8 +6,12 @@ import GameControls from './GameControls';
 import GameResult from './GameResult';
 import { pathToWord } from '../utils/gameLogic';
 
-const PathWordle: React.FC = () => {
-  const { gameState, selectCell, submitGuess, clearPath, resetGame, canSubmit } = usePathWordle();
+interface PathWordleProps {
+  gameMode?: 'daily' | 'practice';
+}
+
+const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily' }) => {
+  const { gameState, selectCell, submitGuess, clearPath, resetGame, canSubmit } = usePathWordle(gameMode);
   
   const currentWord = gameState.currentPath.length > 0 ? pathToWord(gameState.currentPath) : '';
 
@@ -15,7 +19,9 @@ const PathWordle: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">PathWordle</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            PathWordle {gameMode === 'practice' && <span className="text-lg text-blue-600">(Practice)</span>}
+          </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Connect adjacent letters to form paths and guess the hidden 5-letter word. 
             Use the Wordle-style feedback to guide your next guess!
@@ -83,6 +89,7 @@ const PathWordle: React.FC = () => {
             targetWord={gameState.targetWord}
             attemptsUsed={6 - gameState.attemptsLeft}
             onReset={resetGame}
+            gameMode={gameState.gameMode}
           />
         )}
       </div>
