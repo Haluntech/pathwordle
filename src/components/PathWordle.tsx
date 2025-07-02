@@ -1,4 +1,5 @@
 import React from 'react';
+import pathwordleLogo from '../assets/pathwordle_logo.png';
 import { usePathWordle } from '../hooks/usePathWordle';
 import Grid from './Grid';
 import GuessHistory from './GuessHistory';
@@ -18,10 +19,13 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily' }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            PathWordle {gameMode === 'practice' && <span className="text-lg text-blue-600">(Practice)</span>}
-          </h1>
+        <header className="text-center mb-8 flex flex-col items-center">
+          <div className="flex items-center mb-2">
+            <img src={pathwordleLogo} alt="PathWordle Logo" className="w-16 h-16 mr-4" />
+            <h1 className="text-4xl font-bold text-gray-800">
+              PathWordle {gameMode === 'practice' && <span className="text-lg text-blue-600">(Practice)</span>}
+            </h1>
+          </div>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Connect adjacent letters to form paths and guess the hidden 5-letter word. 
             Use the Wordle-style feedback to guide your next guess!
