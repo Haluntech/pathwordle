@@ -5,7 +5,8 @@ import Grid from './Grid';
 import GuessHistory from './GuessHistory';
 import GameControls from './GameControls';
 import GameResult from './GameResult';
-import { pathToWord } from '../utils/gameLogic';
+import { pathToWord, createGrid, getWordForDate, getYesterdaysDate } from '../utils/gameLogic';
+import type { GridCell } from '../types/game';
 
 interface PathWordleProps {
   gameMode?: 'daily' | 'practice';
@@ -17,6 +18,9 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily' }) => {
   const [showYesterdaySolution, setShowYesterdaySolution] = useState(false);
   const [yesterdayData, setYesterdayData] = useState<{ word: string; grid: GridCell[][] } | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Derive current word from current path safely
+  const currentWord = gameState?.currentPath ? pathToWord(gameState.currentPath) : '';
 
   useEffect(() => {
     console.log('PathWordle component mounted with gameState:', gameState);
