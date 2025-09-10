@@ -1,8 +1,11 @@
 import { GridCell, GuessResult } from '../types/game';
-import { getTodaysDate } from '../../../src/utils/gameLogic';
 import { getDailyWord, getPracticeWord, isValidWord } from './wordList';
 
 // Add date utility functions
+export const getTodaysDate = (): string => {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+};
 export const getYesterdaysDate = (): string => {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
