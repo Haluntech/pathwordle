@@ -1,5 +1,18 @@
 import { GridCell, GuessResult } from '../types/game';
+import { getTodaysDate } from '../../../src/utils/gameLogic';
 import { getDailyWord, getPracticeWord, isValidWord } from './wordList';
+
+// Add date utility functions
+export const getYesterdaysDate = (): string => {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return yesterday.toISOString().split('T')[0];
+};
+
+export const getWordForDate = (date: string): string => {
+  // Implementation should match getTodaysWord logic
+  return getDailyWord(date);
+};
 
 const GRID_SIZE = 6;
 const WORD_LENGTH = 5;
@@ -158,10 +171,7 @@ export const isValidPath = (path: GridCell[]): boolean => {
   return isValidWord(word);
 };
 
-export const getTodaysDate = (): string => {
-  const today = new Date();
-  return today.toISOString().split('T')[0];
-};
+
 
 export const getTodaysWord = (): string => {
   return getDailyWord(getTodaysDate());

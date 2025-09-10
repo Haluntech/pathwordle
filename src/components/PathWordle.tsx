@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import pathwordleLogo from '../assets/pathwordle_logo.png';
 import { usePathWordle } from '../hooks/usePathWordle';
 import Grid from './Grid';
@@ -13,8 +13,53 @@ interface PathWordleProps {
 
 const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily' }) => {
   const { gameState, selectCell, submitGuess, clearPath, resetGame, canSubmit } = usePathWordle(gameMode);
-  
-  const currentWord = gameState.currentPath.length > 0 ? pathToWord(gameState.currentPath) : '';
+  const [showTodayHint, setShowTodayHint] = useState(false);
+  const [showYesterdaySolution, setShowYesterdaySolution] = useState(false);
+  const [yesterdayData, setYesterdayData] = useState<{ word: string; grid: GridCell[][] } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log('PathWordle component mounted with gameState:', gameState);
+    if (!gameState) {
+      setError('Failed to initialize game state');
+    } else if (!gameState.grid || gameState.grid.length === 0) {
+      setError('Game grid not initialized');
+    }
+  }, [gameState]);
+
+  const handleYesterdayClick = async () => {
+    try {
+      const yesterday = getYesterdaysDate();
+      const word = getWordForDate(yesterday);
+      if (!word) {
+        throw new Error('No word found for yesterday');
+      }
+      const grid = createGrid(word, yesterday);
+      setYesterdayData({ word, grid });
+      setShowYesterdaySolution(true);
+    } catch (err) {
+      console.error('Error loading yesterday data:', err);
+      alert('Failed to load yesterday\'s solution. Please try again later.');
+      return;
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-red-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg p-6 shadow-lg max-w-md">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Game</h2>
+          <p className="text-gray-700 mb-6">{error}</p>
+          <button
+            onClick={resetGame}
+            className="px-6 py-2 bg-blue-500 text-white rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
