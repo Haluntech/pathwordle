@@ -1,4 +1,4 @@
-import { GridCell, GuessResult } from '../types/game';
+import { GridCell } from '../types/game';
 import { getDailyWord, getPracticeWord, isValidWord } from './wordList';
 
 // Add date utility functions

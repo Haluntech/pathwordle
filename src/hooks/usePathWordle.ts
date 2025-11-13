@@ -7,8 +7,7 @@ import {
   isValidPath, 
   getTodaysDate, 
   getTodaysWord,
-  getPracticeGameWord,
-  areAdjacent 
+  getPracticeGameWord
 } from '../utils/gameLogic';
 
 const STORAGE_KEY = 'pathwordle-game';
@@ -57,12 +56,7 @@ export const usePathWordle = (gameMode: 'daily' | 'practice' = 'daily') => {
     }
   }, [gameState, saveGame]);
 
-  const updateGrid = useCallback((updater: (grid: GridCell[][]) => GridCell[][]) => {
-    setGameState(prev => ({
-      ...prev,
-      grid: updater(prev.grid)
-    }));
-  }, []);
+
 
   const selectCell = useCallback((row: number, col: number) => {
     if (gameState.gameStatus !== 'playing') return;
@@ -186,7 +180,6 @@ export const usePathWordle = (gameMode: 'daily' | 'practice' = 'daily') => {
     
     const isWin = feedback.every(f => f === 'correct');
     const newAttemptsLeft = gameState.attemptsLeft - 1;
-    const isGameOver = isWin || newAttemptsLeft === 0;
     
     setGameState(prev => {
       const newGrid = prev.grid.map(r => r.map(c => ({

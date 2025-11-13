@@ -19,8 +19,8 @@ const GuessHistory: React.FC<GuessHistoryProps> = ({ guesses }) => {
 
   return (
     <div className="w-full max-w-sm">
-      <h3 className="text-lg font-semibold text-gray-800 mb-3">Guess History</h3>
-      <div className="space-y-2">
+      <h3 className="text-lg font-semibold text-gray-800 mb-3 text-center lg:text-left">Guess History</h3>
+      <div className="space-y-2 flex flex-col items-center lg:items-start">
         {guesses.map((guess, index) => (
           <div key={index} className="flex gap-1">
             {guess.word.split('').map((letter, letterIndex) => (

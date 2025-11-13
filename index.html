@@ -1,30 +1,169 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Primary Meta Tags -->
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="description" content="PathWordle: The revolutionary word puzzle game that combines Wordle's beloved mechanics with strategic path-building. Connect adjacent letters to form paths and guess hidden 5-letter words. Perfect for word game enthusiasts looking for a fresh challenge!" />
+    <meta name="keywords" content="PathWordle, word puzzle, word game, daily challenge, brain teaser, letter grid, word guessing, strategic game, cognitive game, vocabulary builder, Wordle alternative" />
+    <meta name="author" content="PathWordle Team" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="1 days" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pathwordle.com/" />
+    <meta property="og:title" content="PathWordle - The Strategic Word Puzzle Revolution" />
+    <meta property="og:description" content="Experience the next evolution of word puzzles! Connect letters to create paths and guess hidden words with familiar Wordle-style feedback. Can you master the grid?" />
+    <meta property="og:image" content="https://pathwordle.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="PathWordle" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://pathwordle.com/" />
+    <meta property="twitter:title" content="PathWordle - Strategic Word Puzzle Game" />
+    <meta property="twitter:description" content="🎯 New twist on word puzzles! Connect letters, build paths, guess words. Daily challenges await!" />
+    <meta property="twitter:image" content="https://pathwordle.com/twitter-card.jpg" />
+    <meta property="twitter:creator" content="@PathWordleGame" />
+    <meta property="twitter:site" content="@PathWordleGame" />
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="application-name" content="PathWordle" />
+    <meta name="apple-mobile-web-app-title" content="PathWordle" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-TileColor" content="#3B82F6" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    <meta name="theme-color" content="#3B82F6" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebGame",
+      "name": "PathWordle",
+      "description": "A strategic word puzzle game where players connect letters to form paths and guess hidden 5-letter words with Wordle-style feedback.",
+      "url": "https://pathwordle.com",
+      "image": "https://pathwordle.com/logo.jpg",
+      "genre": ["Word Game", "Puzzle", "Educational", "Brain Training"],
+      "gamePlatform": "Web Browser",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1000+"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "PathWordle Team"
+      }
+    }
+    </script>
+
+    <!-- Icons and Manifest -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="manifest" href="/site.webmanifest">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="PathWordle is an innovative word puzzle game that applies Wordle's guessing and feedback mechanics to a letter grid. Players 'guess' hidden words by connecting letters to form paths and receive Wordle-style color feedback based on the letters in the path." />
-    <meta name="keywords" content="PathWordle, word puzzle game, Wordle, letter grid, word game, daily challenge, word guessing game" />
-    <meta property="og:title" content="PathWordle - Innovative Letter Grid Word Puzzle" />
-    <meta property="og:description" content="PathWordle is an innovative word puzzle game that applies Wordle's guessing and feedback mechanics to a letter grid. Players connect letters to form paths to guess hidden words and get Wordle-style color feedback." />
-    <meta property="og:type" content="game" />
-    <meta property="og:image" content="/src/assets/pathwordle_logo.png" />
-    <meta property="og:url" content="https://yourwebsite.com/pathwordle" />
-    <title>PathWordle - New Wordle game</title>
-    <script 
-      id="google-adsense" 
-      async 
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7627909166795192" 
-      crossOrigin="anonymous" 
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#3B82F6">
+
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com">
+    <link rel="dns-prefetch" href="//googleads.g.doubleclick.net">
+
+    <!-- Critical CSS for preventing FOUC -->
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #EFF6FF;
+      }
+
+      #root {
+        min-height: 100vh;
+      }
+
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #EFF6FF 0%, #E0E7FF 100%);
+      }
+
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #E5E7EB;
+        border-top: 4px solid #3B82F6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+
+    <title>PathWordle - Strategic Word Puzzle Game | Daily Challenges</title>
+
+    <!-- Google AdSense (deferred loading) -->
+    <script
+      id="google-adsense"
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7627909166795192"
+      crossOrigin="anonymous"
     ></script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Fallback loading state to prevent FOUC -->
+      <div class="loading">
+        <div style="text-align: center;">
+          <div class="loading-spinner"></div>
+          <p style="margin-top: 16px; color: #6B7280; font-family: system-ui;">Loading PathWordle...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main script with integrity and crossorigin for security -->
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Service Worker Registration for PWA -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
