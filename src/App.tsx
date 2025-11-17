@@ -1,9 +1,15 @@
 import React, { useState, lazy, Suspense, memo } from 'react';
-import { Menu, X, Calendar, Target } from 'lucide-react';
+import { Menu, X, Calendar, Target, Settings, Palette, Beaker } from 'lucide-react';
 import ErrorBoundary from './components/ErrorBoundary';
+import ThemeProvider from './contexts/ThemeContext';
+import { LanguageProvider } from './contexts/LanguageContext';
+import { ABTestingProvider } from './contexts/ABTestingContext';
+import { DifficultyConfig } from './config/difficulties';
 
 // Lazy load the main game component for better performance
 const PathWordle = lazy(() => import('./components/PathWordle'));
+const DifficultyDialog = lazy(() => import('./components/DifficultyDialog'));
+const ABTestingAdmin = lazy(() => import('./components/ABTestingAdmin'));
 
 // Loading component for Suspense fallback
 const GameLoader = () => (
@@ -31,12 +37,16 @@ const GameModeSelector = memo(({
   gameMode,
   onModeChange,
   isSidebarOpen,
-  onSidebarToggle
+  onSidebarToggle,
+  onShowDifficultyDialog,
+  onShowABTestingAdmin
 }: {
   gameMode: 'daily' | 'practice';
   onModeChange: (mode: 'daily' | 'practice') => void;
   isSidebarOpen: boolean;
   onSidebarToggle: () => void;
+  onShowDifficultyDialog: () => void;
+  onShowABTestingAdmin: () => void;
 }) => (
   <>
     {/* Mobile Sidebar Toggle */}
@@ -100,6 +110,34 @@ const GameModeSelector = memo(({
             <span className="lg:hidden">Practice</span>
             <span className="hidden lg:inline">Practice Mode</span>
           </button>
+
+          {/* Difficulty Settings Button */}
+          <button
+            onClick={onShowDifficultyDialog}
+            className="
+              flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors
+              bg-gray-100 text-gray-700 hover:bg-gray-200
+              focus:outline-none focus:ring-2 focus:ring-purple-500
+            "
+            aria-label="设置难度"
+          >
+            <Settings size={16} aria-hidden="true" />
+            <span className="hidden lg:inline">难度</span>
+          </button>
+
+          {/* A/B Testing Admin Button */}
+          <button
+            onClick={onShowABTestingAdmin}
+            className="
+              flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors
+              bg-purple-100 text-purple-700 hover:bg-purple-200
+              focus:outline-none focus:ring-2 focus:ring-purple-500
+            "
+            aria-label="A/B Testing Admin"
+          >
+            <Beaker size={16} aria-hidden="true" />
+            <span className="hidden lg:inline">A/B测试</span>
+          </button>
         </div>
       </div>
     </div>
@@ -110,11 +148,18 @@ GameModeSelector.displayName = 'GameModeSelector';
 
 function App() {
   const [gameMode, setGameMode] = useState<'daily' | 'practice'>('daily');
+  const [difficulty, setDifficulty] = useState<DifficultyConfig['id']>('medium');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showDifficultyDialog, setShowDifficultyDialog] = useState(false);
+  const [showABTestingAdmin, setShowABTestingAdmin] = useState(false);
 
   const handleModeChange = React.useCallback((mode: 'daily' | 'practice') => {
     setGameMode(mode);
     setIsSidebarOpen(false);
+  }, []);
+
+  const handleDifficultyChange = React.useCallback((newDifficulty: DifficultyConfig['id']) => {
+    setDifficulty(newDifficulty);
   }, []);
 
   const handleSidebarToggle = React.useCallback(() => {
@@ -123,7 +168,10 @@ function App() {
 
   return (
     <ErrorBoundary onError={handleError}>
-      <div className="relative min-h-screen" role="application" aria-label="PathWordle Game">
+      <LanguageProvider>
+        <ABTestingProvider userId="demo_user" config={{}}>
+          <ThemeProvider>
+          <div className="relative min-h-screen" role="application" aria-label="PathWordle Game">
         {/* Skip to main content link for accessibility */}
         <a href="#main-content" className="skip-link">
           Skip to main content
@@ -134,14 +182,42 @@ function App() {
           onModeChange={handleModeChange}
           isSidebarOpen={isSidebarOpen}
           onSidebarToggle={handleSidebarToggle}
+          onShowDifficultyDialog={() => setShowDifficultyDialog(true)}
+          onShowABTestingAdmin={() => setShowABTestingAdmin(true)}
         />
 
         <ErrorBoundary>
           <Suspense fallback={<GameLoader />}>
-            <PathWordle gameMode={gameMode} />
+            <PathWordle gameMode={gameMode} difficulty={difficulty} />
+          </Suspense>
+        </ErrorBoundary>
+
+        {/* Difficulty Dialog */}
+        <ErrorBoundary>
+          <Suspense fallback={<div />}>
+            <DifficultyDialog
+              isOpen={showDifficultyDialog}
+              onClose={() => setShowDifficultyDialog(false)}
+              selectedDifficulty={difficulty}
+              onDifficultySelect={handleDifficultyChange}
+              gameMode={gameMode}
+            />
+          </Suspense>
+        </ErrorBoundary>
+
+        {/* A/B Testing Admin Dialog */}
+        <ErrorBoundary>
+          <Suspense fallback={<div />}>
+            <ABTestingAdmin
+              isVisible={showABTestingAdmin}
+              onClose={() => setShowABTestingAdmin(false)}
+            />
           </Suspense>
         </ErrorBoundary>
       </div>
+      </ThemeProvider>
+      </ABTestingProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Trophy, X, RotateCcw } from 'lucide-react';
+import { Trophy, X, RotateCcw, Share2 } from 'lucide-react';
+import ShareResultCard from './ShareResultCard';
 
 interface GameResultProps {
   gameStatus: 'won' | 'lost';
@@ -7,6 +8,11 @@ interface GameResultProps {
   attemptsUsed: number;
   onReset: () => void;
   gameMode?: 'daily' | 'practice';
+  difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+  timeTaken?: number;
+  score?: number;
+  hintsUsed?: number;
+  maxStreak?: number;
 }
 
 interface Confetti {
@@ -23,11 +29,17 @@ const GameResult: React.FC<GameResultProps> = ({
   targetWord,
   attemptsUsed,
   onReset,
-  gameMode = 'daily'
+  gameMode = 'daily',
+  difficulty = 'medium',
+  timeTaken = 0,
+  score = 0,
+  hintsUsed = 0,
+  maxStreak = 0
 }) => {
   const isWon = gameStatus === 'won';
   const [confetti, setConfetti] = useState<Confetti[]>([]);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(false);
 
   useEffect(() => {
     if (isWon) {
@@ -110,18 +122,54 @@ const GameResult: React.FC<GameResultProps> = ({
           </div>
         </div>
         
-        <button
-          onClick={onReset}
-          className="
-            flex items-center gap-2 mx-auto px-6 py-3 rounded-lg
-            bg-blue-500 hover:bg-blue-600 text-white font-medium
-            transition-colors duration-200
-          "
-        >
-          <RotateCcw size={16} />
-          {gameMode === 'practice' ? 'Play Again' : 'Play Again Tomorrow'}
-        </button>
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={() => setShowShareCard(true)}
+            className="
+              flex items-center gap-2 mx-auto px-6 py-3 rounded-lg
+              bg-purple-500 hover:bg-purple-600 text-white font-medium
+              transition-colors duration-200
+            "
+          >
+            <Share2 size={16} />
+            Share Result
+          </button>
+
+          <button
+            onClick={onReset}
+            className="
+              flex items-center gap-2 mx-auto px-6 py-3 rounded-lg
+              bg-blue-500 hover:bg-blue-600 text-white font-medium
+              transition-colors duration-200
+            "
+          >
+            <RotateCcw size={16} />
+            {gameMode === 'practice' ? 'Play Again' : 'Play Again Tomorrow'}
+          </button>
+        </div>
       </div>
+
+      {/* Share Result Modal */}
+      {showShareCard && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
+          <ShareResultCard
+            gameData={{
+              mode: gameMode,
+              difficulty,
+              targetWord,
+              won: isWon,
+              attemptsUsed,
+              timeTaken,
+              score,
+              perfectGame: isWon && attemptsUsed === 1,
+              maxStreak,
+              hintsUsed,
+              date: new Date().toISOString()
+            }}
+            onClose={() => setShowShareCard(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };

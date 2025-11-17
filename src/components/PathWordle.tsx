@@ -1,14 +1,31 @@
 import React, { useState, useEffect, useMemo, memo, useCallback } from 'react';
 import pathwordleLogo from '../assets/pathwordle_logo.png';
 import { usePathWordle } from '../hooks/usePathWordle';
+import { useStatistics } from '../hooks/useStatistics';
+import { useLearningAnalytics } from '../hooks/useLearningAnalytics';
 import Grid from './Grid';
 import GuessHistory from './GuessHistory';
 import GameControls from './GameControls';
 import GameResult from './GameResult';
+import Statistics from './Statistics';
+import LearningDashboard from './LearningDashboard';
+import TimeChallengeMode from './TimeChallengeMode';
+import ThemedPuzzleMode from './ThemedPuzzleMode';
+import AchievementNotification, { useAchievementNotifications } from './AchievementNotification';
+import HintPanel from './HintPanel';
+// import Leaderboard from './Leaderboard';
+import Friends from './Friends';
+import Multiplayer from './Multiplayer';
+import ThemeSelector from './ThemeSelector';
+import PuzzleCreator from './PuzzleCreator';
+import NotificationSettings from './NotificationSettings';
+import ABTestingAdmin from './ABTestingAdmin';
 import { pathToWord } from '../utils/gameLogic';
+import { BarChart3, Trophy, Lightbulb, Globe, Users, Swords, Palette, Brain, Clock, BookOpen, Plus, Bell, FlaskConical } from 'lucide-react';
 
 interface PathWordleProps {
   gameMode?: 'daily' | 'practice';
+  difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
 }
 
 // Memoized error boundary component
@@ -183,9 +200,39 @@ const CurrentPathDisplay = memo(({
 
 CurrentPathDisplay.displayName = 'CurrentPathDisplay';
 
-const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily' }) => {
+const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty = 'medium' }) => {
   const { gameState, selectCell, submitGuess, clearPath, resetGame, canSubmit } = usePathWordle(gameMode);
+  const { recordGame, shareResult, getNextAchievement, clearNewAchievements, statistics } = useStatistics();
+  const {
+    startSession,
+    endSession,
+    recordGuess,
+    recordLearningEvent,
+    getAnalytics,
+    getRecommendations,
+    getSessionHistory
+  } = useLearningAnalytics({
+    trackingEnabled: true,
+    dataRetentionDays: 90
+  });
+  const { AchievementNotificationComponent } = useAchievementNotifications();
   const [error, setError] = useState<string | null>(null);
+  const [showStatistics, setShowStatistics] = useState(false);
+  const [showHints, setShowHints] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showFriends, setShowFriends] = useState(false);
+  const [showMultiplayer, setShowMultiplayer] = useState(false);
+  const [showThemeSelector, setShowThemeSelector] = useState(false);
+  const [showLearningDashboard, setShowLearningDashboard] = useState(false);
+  const [showTimeChallenge, setShowTimeChallenge] = useState(false);
+  const [showThemedPuzzles, setShowThemedPuzzles] = useState(false);
+  const [showPuzzleCreator, setShowPuzzleCreator] = useState(false);
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [showABTesting, setShowABTesting] = useState(false);
+  const [currentView, setCurrentView] = useState<'game' | 'timeChallenge' | 'themedPuzzles'>('game');
+  const [gameStartTime, setGameStartTime] = useState<number>(Date.now());
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [guessCount, setGuessCount] = useState(0);
 
   // Memoize current word calculation
   const currentWord = useMemo(() => {
@@ -208,7 +255,138 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily' }) => {
   const handleReset = useCallback(() => {
     resetGame();
     setError(null);
+    setGameStartTime(Date.now());
   }, [resetGame]);
+
+  // Record learning events
+  const recordLearningEvents = useCallback(() => {
+    if (!currentSessionId || !gameState) return;
+
+    // Record pattern recognition events
+    if (guessCount > 0 && guessCount % 3 === 0) {
+      recordLearningEvent(currentSessionId, {
+        type: 'pattern_recognized',
+        data: {
+          pattern: 'letter_positioning',
+          skillArea: 'PATTERN_RECOGNITION',
+          confidence: Math.min(0.5 + (guessCount * 0.1), 1.0),
+          details: 'Player showing improvement in letter positioning'
+        }
+      });
+    }
+
+    // Record skill improvements on good performance
+    if (gameState.gameStatus === 'won' && gameState.attemptsLeft >= 3) {
+      recordLearningEvent(currentSessionId, {
+        type: 'skill_improvement',
+        data: {
+          skillArea: 'PROBLEM_SOLVING',
+          previousSkill: 0.6,
+          newSkill: 0.7,
+          details: 'Excellent performance with efficient word solving'
+        }
+      });
+    }
+  }, [currentSessionId, gameState, guessCount, recordLearningEvent]);
+
+  // 处理游戏结束
+  useEffect(() => {
+    if (gameState && (gameState.gameStatus === 'won' || gameState.gameStatus === 'lost')) {
+      const timeTaken = Math.round((Date.now() - gameStartTime) / 1000); // 转换为秒
+
+      // 计算得分
+      let score = 0;
+      if (gameState.gameStatus === 'won') {
+        score = Math.max(1000 - (gameState.attemptsLeft * 200) - timeTaken, 100);
+      }
+
+      // 记录游戏结果
+      recordGame({
+        won: gameState.gameStatus === 'won',
+        attemptsUsed: 6 - gameState.attemptsLeft,
+        timeTaken,
+        targetWord: gameState.targetWord,
+        mode: gameMode,
+        difficulty: difficulty,
+        hintsUsed: 0, // 可以追踪提示使用情况
+        score
+      });
+
+      // Record learning events for game completion
+      recordLearningEvents();
+
+      // End the learning analytics session
+      if (currentSessionId && (gameState.gameStatus === 'won' || gameState.gameStatus === 'lost')) {
+        endSession(currentSessionId, {
+          gameOutcome: gameState.gameStatus,
+          finalScore: score,
+          timeSpent: timeTaken,
+          efficiency: score > 0 ? score / timeTaken : 0,
+          skillGains: {
+            vocabulary: gameState.gameStatus === 'won' ? 0.1 : 0.05,
+            pattern_recognition: 0.08,
+            logical_reasoning: gameState.gameStatus === 'won' ? 0.12 : 0.06
+          }
+        });
+      }
+    }
+  }, [gameState?.gameStatus, gameState?.targetWord, gameState?.attemptsLeft, gameMode, difficulty, gameStartTime, recordGame, recordLearningEvents, currentSessionId, endSession]);
+
+  // Initialize learning analytics session
+  useEffect(() => {
+    const sessionId = startSession({
+      gameMode,
+      difficulty
+    });
+    setCurrentSessionId(sessionId);
+    setGameStartTime(Date.now());
+    setGuessCount(0);
+
+    return () => {
+      if (sessionId) {
+        // Provide a default result for cleanup - this is called when component unmounts
+        endSession(sessionId, {
+          gameOutcome: 'lost', // Default to lost when component unmounts
+          finalScore: 0,
+          timeSpent: Math.round((Date.now() - gameStartTime) / 1000),
+          efficiency: 0
+        });
+      }
+    };
+  }, [gameMode, difficulty, startSession, endSession]);
+
+  // Track guess submissions for learning analytics
+  useEffect(() => {
+    if (gameState && gameState.guesses.length > guessCount && currentSessionId) {
+      const newGuesses = gameState.guesses.slice(guessCount);
+      newGuesses.forEach(guess => {
+        recordGuess(currentSessionId, {
+          word: guess.word,
+          feedback: guess.feedback,
+          timeTaken: 0, // Could be tracked with timestamps
+          hintsUsed: 0,
+          accuracy: guess.feedback.filter(f => f.status === 'correct').length / 5
+        });
+      });
+      setGuessCount(gameState.guesses.length);
+    }
+  }, [gameState?.guesses.length, guessCount, currentSessionId, recordGuess]);
+
+  // 监听新成就解锁
+  const [currentAchievement, setCurrentAchievement] = useState(null);
+
+
+  useEffect(() => {
+    const nextAchievement = getNextAchievement();
+    if (nextAchievement && nextAchievement !== currentAchievement) {
+      setCurrentAchievement(nextAchievement);
+      // 显示成就通知
+      setTimeout(() => {
+        clearNewAchievements();
+        setCurrentAchievement(null);
+      }, 5000);
+    }
+  }, [statistics, getNextAchievement, clearNewAchievements, currentAchievement]);
 
   useEffect(() => {
     if (__DEV__) {
@@ -268,6 +446,52 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily' }) => {
     return <ErrorBoundary error={error} onReset={handleReset} />;
   }
 
+  // Show different views based on currentView
+  if (currentView === 'timeChallenge') {
+    return (
+      <TimeChallengeMode
+        playerId="player_123" // In real app, this would come from auth context
+        onBack={() => {
+          setCurrentView('game');
+          setShowTimeChallenge(false);
+        }}
+      />
+    );
+  }
+
+  if (currentView === 'themedPuzzles') {
+    return (
+      <ThemedPuzzleMode
+        playerId="player_123" // In real app, this would come from auth context
+        onBack={() => {
+          setCurrentView('game');
+          setShowThemedPuzzles(false);
+        }}
+      />
+    );
+  }
+
+  // Show puzzle creator
+  if (showPuzzleCreator) {
+    return (
+      <PuzzleCreator
+        creatorId="creator_123" // In real app, this would come from auth context
+        creatorName="Player" // In real app, this would come from user profile
+        onClose={() => setShowPuzzleCreator(false)}
+      />
+    );
+  }
+
+  // Show notification settings
+  if (showNotificationSettings) {
+    return (
+      <NotificationSettings
+        isVisible={showNotificationSettings}
+        onClose={() => setShowNotificationSettings(false)}
+      />
+    );
+  }
+
   // Show loading state if game state is not ready
   if (!gameState || !gameState.grid || gameState.grid.length === 0) {
     return (
@@ -284,7 +508,228 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily' }) => {
   const mainContent = useMemo(() => (
     <div id="main-content" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8" tabIndex={-1}>
       <div className="max-w-6xl mx-auto px-4">
-        <GameHeader gameMode={gameMode} />
+        {/* Header with Stats and Hints Buttons */}
+        <div className="flex items-center justify-between mb-8">
+          <GameHeader gameMode={gameMode} />
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setShowHints(!showHints)}
+              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              aria-label={showHints ? 'Hide Hints' : 'Show Hints'}
+              aria-expanded={showHints}
+            >
+              <Lightbulb className="w-5 h-5" />
+              <span className="hidden sm:inline font-medium">Hints</span>
+            </button>
+            <button
+              onClick={() => setShowStatistics(!showStatistics)}
+              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label={showStatistics ? 'Hide Statistics' : 'Show Statistics'}
+              aria-expanded={showStatistics}
+            >
+              <BarChart3 className="w-5 h-5" />
+              <span className="hidden sm:inline font-medium">Statistics</span>
+              <Trophy className="w-4 h-4 text-yellow-500" />
+            </button>
+            {gameMode === 'daily' && (
+              <button
+                onClick={() => setShowLeaderboard(!showLeaderboard)}
+                className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                aria-label={showLeaderboard ? 'Hide Leaderboard' : 'Show Leaderboard'}
+                aria-expanded={showLeaderboard}
+              >
+                <Globe className="w-5 h-5" />
+                <span className="hidden sm:inline font-medium">Leaderboard</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => setShowFriends(!showFriends)}
+              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              aria-label={showFriends ? 'Hide Friends' : 'Show Friends'}
+              aria-expanded={showFriends}
+            >
+              <Users className="w-5 h-5" />
+              <span className="hidden sm:inline font-medium">Friends</span>
+            </button>
+
+            <button
+              onClick={() => setShowMultiplayer(!showMultiplayer)}
+              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              aria-label={showMultiplayer ? 'Hide Multiplayer' : 'Show Multiplayer'}
+              aria-expanded={showMultiplayer}
+            >
+              <Swords className="w-5 h-5" />
+              <span className="hidden sm:inline font-medium">Battle</span>
+            </button>
+
+            <button
+              onClick={() => setShowThemeSelector(!showThemeSelector)}
+              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              aria-label={showThemeSelector ? 'Hide Themes' : 'Show Themes'}
+              aria-expanded={showThemeSelector}
+            >
+              <Palette className="w-5 h-5" />
+              <span className="hidden sm:inline font-medium">Themes</span>
+            </button>
+
+            <button
+              onClick={() => setShowLearningDashboard(!showLearningDashboard)}
+              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              aria-label={showLearningDashboard ? 'Hide Learning Analytics' : 'Show Learning Analytics'}
+              aria-expanded={showLearningDashboard}
+            >
+              <Brain className="w-5 h-5 text-indigo-600" />
+              <span className="hidden sm:inline font-medium">Learning</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setShowTimeChallenge(!showTimeChallenge);
+                setCurrentView(showTimeChallenge ? 'game' : 'timeChallenge');
+              }}
+              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              aria-label={showTimeChallenge ? 'Hide Time Challenge' : 'Show Time Challenge'}
+              aria-expanded={showTimeChallenge}
+            >
+              <Clock className="w-5 h-5 text-orange-600" />
+              <span className="hidden sm:inline font-medium">Time Challenge</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setShowThemedPuzzles(!showThemedPuzzles);
+                setCurrentView(showThemedPuzzles ? 'game' : 'themedPuzzles');
+              }}
+              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              aria-label={showThemedPuzzles ? 'Hide Themed Puzzles' : 'Show Themed Puzzles'}
+              aria-expanded={showThemedPuzzles}
+            >
+              <BookOpen className="w-5 h-5 text-green-600" />
+              <span className="hidden sm:inline font-medium">Themed Puzzles</span>
+            </button>
+            <button
+              onClick={() => setShowPuzzleCreator(!showPuzzleCreator)}
+              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              aria-label={showPuzzleCreator ? 'Hide Puzzle Editor' : 'Show Puzzle Editor'}
+              aria-expanded={showPuzzleCreator}
+            >
+              <Plus className="w-5 h-5 text-purple-600" />
+              <span className="hidden sm:inline font-medium">Create Puzzle</span>
+            </button>
+            <button
+              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              aria-label={showNotificationSettings ? 'Hide Notification Settings' : 'Show Notification Settings'}
+              aria-expanded={showNotificationSettings}
+            >
+              <Bell className="w-5 h-5 text-orange-600" />
+              <span className="hidden sm:inline font-medium">Notifications</span>
+            </button>
+            <button
+              onClick={() => setShowABTesting(!showABTesting)}
+              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              aria-label={showABTesting ? 'Hide A/B Testing' : 'Show A/B Testing'}
+              aria-expanded={showABTesting}
+            >
+              <FlaskConical className="w-5 h-5 text-pink-600" />
+              <span className="hidden sm:inline font-medium">A/B Testing</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Hints Panel */}
+        {showHints && gameState && (
+          <div className="mb-8">
+            <HintPanel
+              grid={gameState.grid}
+              currentPath={gameState.currentPath}
+              difficulty={difficulty}
+              targetWord={gameState.targetWord}
+              isVisible={showHints}
+              onClose={() => setShowHints(false)}
+              compact={true}
+            />
+          </div>
+        )}
+
+        {/* Statistics Panel */}
+        {showStatistics && (
+          <div className="mb-8">
+            <Statistics showDetailed={false} />
+          </div>
+        )}
+
+        {/* Leaderboard Panel */}
+        {showLeaderboard && (
+          <div className="mb-8">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Leaderboard temporarily unavailable</h3>
+              <p className="text-gray-600">We are currently maintaining the leaderboard system. Please try again later.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Friends Panel */}
+        {showFriends && (
+          <div className="mb-8">
+            <Friends compact={false} showActions={true} />
+          </div>
+        )}
+
+        {/* Multiplayer Panel */}
+        {showMultiplayer && (
+          <div className="mb-8">
+            <Multiplayer />
+          </div>
+        )}
+
+        {/* Theme Selector Panel */}
+        {showThemeSelector && (
+          <div className="mb-8">
+            <ThemeSelector />
+          </div>
+        )}
+
+        {/* Learning Dashboard Panel */}
+        {showLearningDashboard && (
+          <div className="mb-8">
+            <LearningDashboard
+              analytics={getAnalytics()}
+              recommendations={getRecommendations()}
+              sessionHistory={getSessionHistory()}
+              onClose={() => setShowLearningDashboard(false)}
+            />
+          </div>
+        )}
+
+        {/* Themed Puzzles Panel */}
+        {showThemedPuzzles && (
+          <div className="mb-8">
+            <ThemedPuzzleMode />
+          </div>
+        )}
+
+        {/* Puzzle Creator Panel */}
+        {showPuzzleCreator && (
+          <div className="mb-8">
+            <PuzzleCreator />
+          </div>
+        )}
+
+        {/* Notification Settings Panel */}
+        {showNotificationSettings && (
+          <div className="mb-8">
+            <NotificationSettings />
+          </div>
+        )}
+
+        {/* A/B Testing Panel */}
+        {showABTesting && (
+          <div className="mb-8">
+            <ABTestingAdmin />
+          </div>
+        )}
 
         <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start justify-center">
           {/* Game Grid */}
@@ -327,6 +772,11 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily' }) => {
             attemptsUsed={6 - gameState.attemptsLeft}
             onReset={handleReset}
             gameMode={gameState.gameMode}
+            difficulty={difficulty}
+            timeTaken={Math.round((Date.now() - gameStartTime) / 1000)}
+            score={gameState.gameStatus === 'won' ? Math.max(1000 - ((6 - gameState.attemptsLeft - 1) * 200) - Math.round((Date.now() - gameStartTime) / 1000), 100) : 0}
+            hintsUsed={0} // Can be tracked in the future
+            maxStreak={statistics.maxStreak} // Can be retrieved from statistics
           />
         )}
       </div>
@@ -344,10 +794,40 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily' }) => {
     gameState.guesses,
     gameState.gameStatus,
     gameState.targetWord,
-    handleReset
+    handleReset,
+    showStatistics,
+    showLearningDashboard,
+    getAnalytics,
+    getRecommendations,
+    getSessionHistory
   ]);
 
-  return mainContent;
+  return (
+    <>
+      {mainContent}
+      {/* 成就通知 */}
+      <AchievementNotification
+        achievement={currentAchievement}
+        onClose={() => {
+          setCurrentAchievement(null);
+          clearNewAchievements();
+        }}
+      />
+
+      {/* 全屏提示面板 */}
+      {showHints && gameState && (
+        <HintPanel
+          grid={gameState.grid}
+          currentPath={gameState.currentPath}
+          difficulty={difficulty}
+          targetWord={gameState.targetWord}
+          isVisible={showHints}
+          onClose={() => setShowHints(false)}
+          compact={false}
+        />
+      )}
+    </>
+  );
 };
 
 export default PathWordle;
