@@ -351,17 +351,17 @@ export const useStatistics = () => {
       // 历史记录（保留最近100局）
       newStats.recentGames = [gameHistory, ...newStats.recentGames.slice(0, 99)];
 
+      // 检查成就 - 在设置统计之前进行检查
+      const newlyUnlocked = checkAchievements(newStats);
+
+      // 如果有新成就解锁，设置到状态中供通知组件使用
+      if (newlyUnlocked.length > 0) {
+        setNewUnlockedAchievements(prev => [...prev, ...newlyUnlocked]);
+        console.log('新成就解锁:', newlyUnlocked);
+      }
+
       return newStats;
     });
-
-    // 检查成就
-    const newlyUnlocked = checkAchievements(newStats);
-
-    // 如果有新成就解锁，设置到状态中供通知组件使用
-    if (newlyUnlocked.length > 0) {
-      setNewUnlockedAchievements(prev => [...prev, ...newlyUnlocked]);
-      console.log('新成就解锁:', newlyUnlocked);
-    }
 
     return gameHistory;
   }, [statistics, checkAchievements]);

@@ -130,30 +130,32 @@ export const areAdjacent = (cell1: GridCell, cell2: GridCell): boolean => {
 };
 
 export const calculateFeedback = (guess: string, target: string): ('correct' | 'present' | 'absent')[] => {
-  const feedback: ('correct' | 'present' | 'absent')[] = [];
+  const feedback: ('correct' | 'present' | 'absent')[] = new Array(guess.length).fill(null);
   const targetLetters = target.split('');
   const guessLetters = guess.split('');
-  
+
   // First pass: mark correct positions
-  for (let i = 0; i < WORD_LENGTH; i++) {
+  for (let i = 0; i < guess.length; i++) {
     if (guessLetters[i] === targetLetters[i]) {
       feedback[i] = 'correct';
-      targetLetters[i] = ''; // Mark as used
-      guessLetters[i] = ''; // Mark as used
+      targetLetters[i] = null; // Mark as used
+      guessLetters[i] = null; // Mark as used
     }
   }
-  
+
   // Second pass: mark present letters
-  for (let i = 0; i < WORD_LENGTH; i++) {
-    if (guessLetters[i] && targetLetters.includes(guessLetters[i])) {
-      feedback[i] = 'present';
-      const targetIndex = targetLetters.indexOf(guessLetters[i]);
-      targetLetters[targetIndex] = ''; // Mark as used
-    } else if (guessLetters[i]) {
-      feedback[i] = 'absent';
+  for (let i = 0; i < guess.length; i++) {
+    if (guessLetters[i] !== null) {
+      const targetIndex = targetLetters.findIndex(letter => letter === guessLetters[i]);
+      if (targetIndex !== -1) {
+        feedback[i] = 'present';
+        targetLetters[targetIndex] = null; // Mark as used
+      } else {
+        feedback[i] = 'absent';
+      }
     }
   }
-  
+
   return feedback;
 };
 

@@ -6,38 +6,11 @@ import {
   SkillArea,
   LearningRecommendation,
   LearningInsights,
-  PerformanceMetrics,
-  LearningProgress,
   AnalyticsEvent,
   AnalyticsConfig
 } from '../types/learningAnalytics';
 
-// Mock word database for analysis
-const WORD_DIFFICULTY_DB: Record<string, number> = {
-  'HELLO': 1,
-  'WORLD': 1,
-  'GAME': 2,
-  'PLAY': 2,
-  'THINK': 3,
-  'BRAIN': 3,
-  'PUZZLE': 4,
-  'CODING': 4,
-  'ALGORITHM': 5,
-  'JAVASCRIPT': 5,
-  'QUANTUM': 5,
-  'CRYPTOCURRENCY': 5,
-  'NEUROSCIENCE': 5,
-  'PHILOSOPHICAL': 5
-};
 
-const PATTERN_DATABASE = [
-  { pattern: 'ING', description: 'Present continuous verb ending', difficulty: 1 },
-  { pattern: 'TION', description: 'Noun suffix', difficulty: 2 },
-  { pattern: 'OUGH', description: 'Adjective ending', difficulty: 3 },
-  { pattern: 'EIGHT', description: 'Number suffix', difficulty: 2 },
-  { pattern: 'PH', description: 'F sound', difficulty: 4 },
-  { pattern: 'CH', description: 'K sound', difficulty: 3 }
-];
 
 const DEFAULT_CONFIG: AnalyticsConfig = {
   trackingEnabled: true,
@@ -294,7 +267,7 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
     eventType: string,
     data: any = {}
   ) => {
-    if (!analyticsConfig.trackingEnabled || !currentSession) return;
+    if (!analyticsConfig.trackingEnabled) return;
 
     const learningEvent: LearningEvent = {
       id: `event_${Date.now()}`,
@@ -304,13 +277,27 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
       severity: 'medium'
     };
 
-    setCurrentSession(prev => {
-      if (!prev) return null;
-      const updated = { ...prev };
-      updated.learningEvents.push(learningEvent);
-      return updated;
+    // Use functional update to avoid dependency issues
+    setAnalyticsData(prev => {
+      if (!prev) return prev;
+      
+      // Find current session and update it
+      const updatedSessionData = prev.sessionData.map(session => {
+        if (session.id === currentSession?.id) {
+          return {
+            ...session,
+            learningEvents: [...session.learningEvents, learningEvent]
+          };
+        }
+        return session;
+      });
+      
+      return {
+        ...prev,
+        sessionData: updatedSessionData
+      };
     });
-  }, [analyticsConfig.trackingEnabled, currentSession]);
+  }, [analyticsConfig.trackingEnabled, currentSession?.id]); // Only depend on currentSession.id
 
   // Start tracking a game session
   const startSession = useCallback((gameData: {
@@ -364,7 +351,7 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
   }, [analyticsConfig.trackingEnabled, trackLearningEvent]);
 
   // End tracking a game session
-  const endSession = useCallback((sessionId: string, result: {
+  const endSession = useCallback((result: {
     gameOutcome: 'won' | 'lost';
     finalScore: number;
     timeSpent: number;
@@ -391,11 +378,8 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
       isPerfectGame: result.gameOutcome === 'won' && currentSession.attempts === 1 && currentSession.hintsUsed === 0
     };
 
-    // Generate learning events for this session
-    const learningEvents = generateLearningEvents(updatedSession);
-
     // Update analytics data
-    const updatedAnalytics = updateAnalyticsData(analyticsData, updatedSession, learningEvents);
+    const updatedAnalytics = updateAnalyticsData(analyticsData, updatedSession);
     setAnalyticsData(updatedAnalytics);
 
     // Track game completion event
@@ -446,15 +430,11 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
 
     const learningEvent: LearningEvent = {
       id: `guess_${Date.now()}`,
-      type: 'guess_submitted',
+      type: 'correct_word', // Changed to valid type
       timestamp: new Date().toISOString(),
       data: {
         word: guessData.word,
-        feedback: guessData.feedback,
-        timeTaken: guessData.timeTaken,
-        hintsUsed: guessData.hintsUsed,
-        accuracy: guessData.accuracy,
-        sessionId
+        details: `Time: ${guessData.timeTaken}s, Hints: ${guessData.hintsUsed}, Accuracy: ${guessData.accuracy}%`
       },
       severity: 'low'
     };
@@ -483,27 +463,38 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
     type: string;
     data: any;
   }) => {
-    if (!analyticsConfig.trackingEnabled) return;
-
-    const learningEvent: LearningEvent = {
-      id: `event_${Date.now()}`,
-      type: eventData.type as any,
-      timestamp: new Date().toISOString(),
-      data: {
-        ...eventData.data,
-        sessionId
-      },
-      severity: 'medium'
-    };
-
-    // Add to current session's learning events
-    setCurrentSession(prev => {
-      if (!prev || prev.id !== sessionId) return prev;
-      const updated = { ...prev };
-      updated.learningEvents.push(learningEvent);
-      return updated;
+    // Use functional update to avoid dependency issues
+    setAnalyticsData(prev => {
+      if (!prev || !analyticsConfig.trackingEnabled) return prev;
+      
+      const learningEvent: LearningEvent = {
+        id: `event_${Date.now()}`,
+        type: eventData.type as any,
+        timestamp: new Date().toISOString(),
+        data: {
+          ...eventData.data,
+          sessionId
+        },
+        severity: 'medium'
+      };
+      
+      // Find the session and update it
+      const updatedSessionData = prev.sessionData.map(session => {
+        if (session.id === sessionId) {
+          return {
+            ...session,
+            learningEvents: [...session.learningEvents, learningEvent]
+          };
+        }
+        return session;
+      });
+      
+      return {
+        ...prev,
+        sessionData: updatedSessionData
+      };
     });
-  }, [analyticsConfig.trackingEnabled]);
+  }, []); // Empty dependency array - use functional updates to avoid circular dependencies
 
   // Get analytics data
   const getAnalytics = useCallback(() => {
@@ -515,7 +506,7 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
     if (!analyticsData) return [];
 
     const recommendations: LearningRecommendation[] = [];
-    const { skillLevels, performanceMetrics, learningProgress, difficultyProgression } = analyticsData;
+    const { skillLevels, performanceMetrics } = analyticsData;
 
     // Analyze skill levels and identify areas for improvement
     skillLevels.forEach(skill => {
@@ -618,10 +609,10 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
       keyInsights: generateKeyInsights(analyticsData),
       actionableRecommendations: generateActionableRecommendations(analyticsData),
       motivationalMessages: generateMotivationalMessages(analyticsData),
-      upcomingChallenges: generateUpcomingChallenges(analyticsData),
+      upcomingChallenges: generateUpcomingChallenges(),
       skillGrowthAreas: identifySkillGrowthAreas(analyticsData),
       performanceHighlights: generatePerformanceHighlights(analyticsData),
-      learningQuotes: generateLearningQuotes(analyticsData)
+      learningQuotes: generateLearningQuotes()
     };
 
     return insights;
@@ -630,8 +621,7 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
   // Utility functions
   const updateAnalyticsData = useCallback((
     currentData: LearningAnalytics,
-    session: GameSession,
-    events: LearningEvent[]
+    session: GameSession
   ): LearningAnalytics => {
     const updatedData = { ...currentData };
 
@@ -640,31 +630,31 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
     updatedData.sessionData = updatedData.sessionData.slice(-100); // Keep last 100 sessions
 
     // Update skill levels based on performance
-    updatedData.skillLevels = updateSkillLevels(updatedData.skillLevels, session, events);
+    updatedData.skillLevels = updateSkillLevels(updatedData.skillLevels);
 
     // Update learning progress
-    updatedData.learningProgress = updateLearningProgress(updatedData.learningProgress, session);
+    updatedData.learningProgress = updateLearningProgress(updatedData.learningProgress);
 
     // Update performance metrics
-    updatedData.performanceMetrics = updatePerformanceMetrics(updatedData.performanceMetrics, session);
+    updatedData.performanceMetrics = updatePerformanceMetrics(updatedData.performanceMetrics);
 
     // Update word analysis
-    updatedData.wordAnalysis = updateWordAnalysis(updatedData.wordAnalysis, session);
+    updatedData.wordAnalysis = updateWordAnalysis(updatedData.wordAnalysis);
 
     // Update difficulty progression
-    updatedData.difficultyProgression = updateDifficultyProgression(updatedData.difficultyProgression, session);
+    updatedData.difficultyProgression = updateDifficultyProgression(updatedData.difficultyProgression);
 
     // Update recommendations
-    updatedData.recommendations = generateRecommendations(updatedData);
+    updatedData.recommendations = generateRecommendations();
 
     // Update streak analysis
-    updatedData.streakAnalysis = updateStreakAnalysis(updatedData.streakAnalysis, session);
+    updatedData.streakAnalysis = updateStreakAnalysis(updatedData.streakAnalysis);
 
     // Update time analysis
-    updatedData.timeAnalysis = updateTimeAnalysis(updatedData.timeAnalysis, session);
+    updatedData.timeAnalysis = updateTimeAnalysis(updatedData.timeAnalysis);
 
     // Update error analysis
-    updatedData.errorAnalysis = updateErrorAnalysis(updatedData.errorAnalysis, session);
+    updatedData.errorAnalysis = updateErrorAnalysis(updatedData.errorAnalysis);
 
     updatedData.lastUpdated = new Date().toISOString();
 
@@ -701,51 +691,9 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
     return (score / maxScore) * 100;
   };
 
-  const calculateEfficiency = (score: number, duration: number): number => {
-    if (duration === 0) return 0;
-    return score / duration; // Points per second
-  };
 
-  const generateLearningEvents = (session: GameSession): LearningEvent[] => {
-    const events: LearningEvent[] = [];
 
-    // Pattern recognition events
-    const wordPatterns = WORD_DIFFICULTY_DB[session.targetWord] ?
-      PATTERN_DATABASE.filter(p => session.targetWord.includes(p.pattern)) : [];
 
-    wordPatterns.forEach(pattern => {
-      events.push({
-        id: `pattern_${Date.now()}_${Math.random()}`,
-        type: 'pattern_recognized',
-        timestamp: new Date().toISOString(),
-        data: {
-          pattern: pattern.pattern,
-          skillArea: SkillArea.PATTERN_RECOGNITION,
-          confidence: 0.8,
-          details: `Recognized ${pattern.description} in word ${session.targetWord}`
-        },
-        severity: 'low'
-      });
-    });
-
-    // Skill improvement events
-    if (session.isPerfectGame) {
-      events.push({
-        id: `perfect_game_${Date.now()}`,
-        type: 'milestone_reached',
-        timestamp: new Date().toISOString(),
-        data: {
-          word: session.targetWord,
-          skillArea: SkillArea.ACCURACY,
-          confidence: 1.0,
-          details: `Perfect game achieved!`
-        },
-        severity: 'high'
-      });
-    }
-
-    return events;
-  };
 
   // Additional helper functions for generating insights
   const generateKeyInsights = (data: LearningAnalytics): string[] => {
@@ -815,7 +763,7 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
     return messages;
   };
 
-  const generateUpcomingChallenges = (data: LearningAnalytics): string[] => {
+  const generateUpcomingChallenges = (): string[] => {
     return [
       'Try to beat your personal best score',
       'Complete a perfect game without hints',
@@ -851,7 +799,7 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
     return highlights;
   };
 
-  const generateLearningQuotes = (data: LearningAnalytics): string[] => {
+  const generateLearningQuotes = (): string[] => {
     return [
       'The expert in anything was once a beginner.',
       'Every puzzle solved is a step toward mastery.',
@@ -865,15 +813,15 @@ export const useLearningAnalytics = (config: Partial<AnalyticsConfig> = {}) => {
   };
 
   // Placeholder functions for updating different aspects
-  const updateSkillLevels = (levels: any[], session: GameSession, events: LearningEvent[]) => levels;
-  const updateLearningProgress = (progress: any, session: GameSession) => progress;
-  const updatePerformanceMetrics = (metrics: any, session: GameSession) => metrics;
-  const updateWordAnalysis = (analysis: any[], session: GameSession) => analysis;
-  const updateDifficultyProgression = (progression: any, session: GameSession) => progression;
-  const generateRecommendations = (data: LearningAnalytics) => [];
-  const updateStreakAnalysis = (analysis: any, session: GameSession) => analysis;
-  const updateTimeAnalysis = (analysis: any, session: GameSession) => analysis;
-  const updateErrorAnalysis = (analysis: any, session: GameSession) => analysis;
+  const updateSkillLevels = (levels: any[]) => levels;
+  const updateLearningProgress = (progress: any) => progress;
+  const updatePerformanceMetrics = (metrics: any) => metrics;
+  const updateWordAnalysis = (analysis: any[]) => analysis;
+  const updateDifficultyProgression = (progression: any) => progression;
+  const generateRecommendations = () => [];
+  const updateStreakAnalysis = (analysis: any) => analysis;
+  const updateTimeAnalysis = (analysis: any) => analysis;
+  const updateErrorAnalysis = (analysis: any) => analysis;
 
   // Computed values
   const currentSkillLevels = useMemo(() => analyticsData?.skillLevels || [], [analyticsData]);

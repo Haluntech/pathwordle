@@ -18,7 +18,8 @@ import {
   Calendar,
   Clock,
   Award,
-  TrendingUp
+  TrendingUp,
+  X
 } from 'lucide-react';
 
 interface ShareResultCardProps {

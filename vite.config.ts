@@ -1,16 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react({
-      // Enable Fast Refresh
-      fastRefresh: true,
-      // Optimize React imports
-      jsxImportSource: 'react',
-    }),
+    react(),
   ],
   build: {
     // Optimize build for production
@@ -35,13 +29,6 @@ export default defineConfig({
     assetsInlineLimit: 4096,
   },
   server: {
-    fs: {
-      // Allow parent workspace folder so deps resolved from parent node_modules won't be blocked
-      allow: [
-        process.cwd(),
-        path.resolve(process.cwd(), '..'),
-      ],
-    },
     // Enable HMR
     hmr: true,
   },
@@ -60,6 +47,6 @@ export default defineConfig({
   },
   // Define global constants
   define: {
-    __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),
+    __DEV__: JSON.stringify(true),
   },
 });

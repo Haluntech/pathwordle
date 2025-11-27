@@ -119,10 +119,10 @@ const GameModeSelector = memo(({
               bg-gray-100 text-gray-700 hover:bg-gray-200
               focus:outline-none focus:ring-2 focus:ring-purple-500
             "
-            aria-label="设置难度"
+            aria-label="设置"
           >
             <Settings size={16} aria-hidden="true" />
-            <span className="hidden lg:inline">难度</span>
+            <span className="hidden lg:inline">Difficulty</span>
           </button>
 
           {/* A/B Testing Admin Button */}
@@ -136,7 +136,7 @@ const GameModeSelector = memo(({
             aria-label="A/B Testing Admin"
           >
             <Beaker size={16} aria-hidden="true" />
-            <span className="hidden lg:inline">A/B测试</span>
+            <span className="hidden lg:inline">A/B Test</span>
           </button>
         </div>
       </div>

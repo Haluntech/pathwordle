@@ -48,9 +48,9 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
   const summary = getStatisticsSummary();
 
   const formatTime = (seconds: number): string => {
-    if (seconds < 60) return `${seconds}秒`;
-    if (seconds < 3600) return `${Math.round(seconds / 60)}分钟`;
-    return `${Math.round(seconds / 3600)}小时`;
+    if (seconds < 60) return `${seconds} second${seconds === 1 ? '' : 's'}`;
+    if (seconds < 3600) return `${Math.round(seconds / 60)} minute${Math.round(seconds / 60) === 1 ? '' : 's'}`;
+    return `${Math.round(seconds / 3600)} hour${Math.round(seconds / 3600) === 1 ? '' : 's'}`;  
   };
 
   const formatPercentage = (value: number): string => {
@@ -93,12 +93,12 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
 
   const getRarityLabel = (rarity: string): string => {
     const labels = {
-      common: '普通',
-      rare: '稀有',
-      epic: '史诗',
-      legendary: '传说'
+      common: 'Common',
+      rare: 'Rare',
+      epic: 'Epic',
+      legendary: 'Legendary'
     };
-    return labels[rarity as keyof typeof labels] || '普通';
+    return labels[rarity as keyof typeof labels] || 'Common';
   };
 
   if (!showDetailed) {
@@ -107,28 +107,28 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
       <div className={`grid grid-cols-2 md:grid-cols-4 gap-3 ${className}`}>
         <StatCard
           icon={<Trophy className="w-5 h-5" />}
-          title="游戏场次"
+          title="Games Played"
           value={statistics.gamesPlayed}
-          subtitle={`胜率 ${formatPercentage(Math.round(statistics.winRate))}`}
+          subtitle={`Win Rate ${formatPercentage(Math.round(statistics.winRate))}`}
           color="blue"
         />
         <StatCard
           icon={<TrendingUp className="w-5 h-5" />}
-          title="当前连胜"
+          title="Current Streak"
           value={statistics.currentStreak}
-          subtitle={`最高 ${statistics.maxStreak}`}
+          subtitle={`Max ${statistics.maxStreak}`}  
           color="green"
         />
         <StatCard
           icon={<Clock className="w-5 h-5" />}
-          title="平均用时"
+          title="Average Time"
           value={formatTime(summary.averageTime)}
-          subtitle={summary.fastestWin > 0 ? `最快 ${formatTime(summary.fastestWin)}` : ''}
+          subtitle={summary.fastestWin > 0 ? `Fastest Win ${formatTime(summary.fastestWin)}` : ''}
           color="purple"
         />
         <StatCard
           icon={<Award className="w-5 h-5" />}
-          title="成就进度"
+          title="Achievements Unlocked"
           value={`${statistics.achievementsUnlocked}/${achievements.length}`}
           subtitle={formatPercentage(Math.round(statistics.completionRate))}
           color="orange"
@@ -140,7 +140,7 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
   return (
     <div className={`bg-white rounded-xl shadow-lg p-6 ${className}`}>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">游戏统计</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Game Statistics</h2>
         <div className="flex gap-2">
           {(['overview', 'achievements', 'history'] as const).map(tab => (
             <button
@@ -153,9 +153,9 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
               }`}
               aria-pressed={activeTab === tab}
             >
-              {tab === 'overview' && '概览'}
-              {tab === 'achievements' && '成就'}
-              {tab === 'history' && '历史'}
+              {tab === 'overview' && 'Overview'}
+              {tab === 'achievements' && 'Achievements'}
+              {tab === 'history' && 'History'}
             </button>
           ))}
         </div>
@@ -167,30 +167,30 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
               icon={<Trophy className="w-6 h-6" />}
-              title="总游戏场数"
+              title="Total Games Played"
               value={statistics.gamesPlayed}
-              subtitle={`${statistics.gamesWon}胜 ${statistics.gamesLost}负`}
+              subtitle={`${statistics.gamesWon} Win ${statistics.gamesLost} Loss`}
               color="blue"
             />
             <StatCard
               icon={<Target className="w-6 h-6" />}
-              title="胜率"
+              title="Win Rate"
               value={formatPercentage(Math.round(statistics.winRate))}
-              subtitle={`${getMostUsedGuesses()}次最常用`}
+              subtitle={`${getMostUsedGuesses()} times most common`}
               color={getWinRateColor(Math.round(statistics.winRate))}
             />
             <StatCard
               icon={<TrendingUp className="w-6 h-6" />}
-              title="连胜记录"
+              title="Win Streak"
               value={statistics.currentStreak}
-              subtitle={`最高记录: ${statistics.maxStreak}`}
+              subtitle={`Max ${statistics.maxStreak}`}
               color="green"
             />
             <StatCard
               icon={<Clock className="w-6 h-6" />}
-              title="游戏时间"
+              title="Game Time"
               value={formatTime(summary.averageTime)}
-              subtitle={`总计 ${formatTime(statistics.totalPlayTime)}`}
+              subtitle={`Total ${formatTime(statistics.totalPlayTime)}`}
               color="purple"
             />
           </div>
@@ -199,7 +199,7 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
               <Target className="w-5 h-5" />
-              猜测次数分布
+              Guess Distribution
             </h3>
             <div className="flex items-end gap-2 h-32">
               {Object.entries(statistics.guessDistribution).map(([guess, count]) => {
@@ -227,10 +227,10 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
             {Object.entries(statistics.difficultyStats).map(([difficulty, stats]) => {
               const winRate = stats.played > 0 ? Math.round((stats.won / stats.played) * 100) : 0;
               const labels = {
-                easy: '简单',
-                medium: '中等',
-                hard: '困难',
-                expert: '专家'
+                easy: 'Easy',
+                medium: 'Medium',
+                hard: 'Hard',
+                expert: 'Expert'
               };
 
               return (
@@ -238,7 +238,7 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
                   <h4 className="font-medium text-gray-800">{labels[difficulty as keyof typeof labels]}</h4>
                   <div className="text-2xl font-bold text-gray-900">{stats.played}</div>
                   <div className="text-sm text-gray-600">
-                    {stats.won}胜 · {winRate}%胜率
+                    {stats.won} Win · {winRate}% Win Rate
                   </div>
                 </div>
               );
@@ -251,7 +251,7 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
         <div className="space-y-4">
           <div className="flex items-center justify-between mb-4">
             <p className="text-gray-600">
-              已解锁 {statistics.achievementsUnlocked} / {achievements.length} 个成就
+              Unlocked {statistics.achievementsUnlocked} / {achievements.length} Achievements
             </p>
             <span className="text-lg font-semibold text-blue-600">
               {formatPercentage(Math.round(statistics.completionRate))}
@@ -284,7 +284,7 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
                     {!achievement.unlocked && (
                       <div className="space-y-1">
                         <div className="flex items-center justify-between text-xs">
-                          <span>进度</span>
+                          <span>Progress</span>
                           <span>{Math.round(achievement.progress)}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
@@ -298,7 +298,7 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
 
                     {achievement.unlocked && achievement.unlockedDate && (
                       <div className="text-xs text-green-600 mt-2">
-                        ✓ {new Date(achievement.unlockedDate).toLocaleDateString()} 解锁
+                        ✓ {new Date(achievement.unlockedDate).toLocaleDateString()} Unlocked
                       </div>
                     )}
 
@@ -318,17 +318,17 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
       {activeTab === 'history' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-800">最近游戏记录</h3>
+            <h3 className="font-semibold text-gray-800">Recent Games</h3>
             <span className="text-sm text-gray-600">
-              显示最近 {Math.min(statistics.recentGames.length, 20)} 局
+              Show Recent {Math.min(statistics.recentGames.length, 20)} Games
             </span>
           </div>
 
           {statistics.recentGames.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Trophy className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>还没有游戏记录</p>
-              <p className="text-sm">开始你的第一局游戏吧！</p>
+              <p>No Recent Games</p>
+              <p className="text-sm">Start Your First Game!</p> 
             </div>
           ) : (
             <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -348,7 +348,7 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
                         </span>
                         {game.perfectGame && (
                           <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
-                            完美!
+                            Perfect Game!
                           </span>
                         )}
                       </div>
@@ -363,12 +363,12 @@ const Statistics: React.FC<StatisticsProps> = ({ className = '', showDetailed = 
                       {formatTime(game.timeTaken)}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {game.attemptsUsed}/6 次猜测
+                      {game.attemptsUsed}/6 Guesses
                     </div>
                     {game.shared && (
                       <div className="text-xs text-blue-600 flex items-center gap-1">
                         <Share2 className="w-3 h-3" />
-                        已分享
+                        Shared
                       </div>
                     )}
                   </div>

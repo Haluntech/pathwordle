@@ -138,32 +138,46 @@ export const useTimeChallenge = ({
 
   // Timer management
   const startTimer = useCallback(() => {
-    if (timerRef.current) return;
+    if (timerRef.current) {
+      console.warn('Timer already running');
+      return;
+    }
+
+    if (!currentChallenge) {
+      console.error('Cannot start timer: No active challenge');
+      return;
+    }
 
     startTimeRef.current = Date.now() - pausedTimeRef.current;
     setTimerState(TIMER_STATES.RUNNING);
 
     timerRef.current = setInterval(() => {
-      const elapsed = Date.now() - startTimeRef.current;
-      const remaining = Math.max(0, (session?.challengeId && currentChallenge?.timeLimit ? currentChallenge.timeLimit * 1000 : 180000) - elapsed);
+      try {
+        const elapsed = Date.now() - startTimeRef.current;
+        const timeLimitMs = currentChallenge.timeLimit * 1000;
+        const remaining = Math.max(0, timeLimitMs - elapsed);
 
-      setTimeRemaining(Math.ceil(remaining / 1000));
+        setTimeRemaining(Math.ceil(remaining / 1000));
 
-      // Warning state when time is running out
-      if (remaining <= settings.warningTime * 1000 && remaining > 0) {
-        setTimerState(TIMER_STATES.WARNING);
-        if (settings.soundEnabled) {
-          // Play warning sound
-          playSound('warning');
+        // Warning state when time is running out
+        if (remaining <= settings.warningTime * 1000 && remaining > 0) {
+          setTimerState(TIMER_STATES.WARNING);
+          if (settings.soundEnabled) {
+            // Play warning sound
+            playSound('warning');
+          }
         }
-      }
 
-      // Timer expired
-      if (remaining <= 0) {
-        endChallenge(false);
+        // Timer expired
+        if (remaining <= 0) {
+          endChallenge(false);
+        }
+      } catch (error) {
+        console.error('Timer error:', error);
+        stopTimer();
       }
     }, 100); // Update every 100ms for smooth countdown
-  }, [session?.challengeId, currentChallenge?.timeLimit, settings]);
+  }, [session?.challengeId, currentChallenge, settings, endChallenge, playSound]);
 
   const pauseTimer = useCallback(() => {
     if (timerRef.current) {
