@@ -332,18 +332,18 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
     }
   }, [currentSessionId, gameState, guessCount, recordLearningEvent]);
 
-  // 处理游戏结束
+  // Handle game completion
   useEffect(() => {
     if (gameState && (gameState.gameStatus === 'won' || gameState.gameStatus === 'lost')) {
-      const timeTaken = Math.round((Date.now() - gameStartTime) / 1000); // 转换为秒
+      const timeTaken = Math.round((Date.now() - gameStartTime) / 1000); // Convert to seconds
 
-      // 计算得分
+      // Calculate score
       let score = 0;
       if (gameState.gameStatus === 'won') {
         score = Math.max(1000 - (gameState.attemptsLeft * 200) - timeTaken, 100);
       }
 
-      // 记录游戏结果
+      // Record game result
       recordGame({
         won: gameState.gameStatus === 'won',
         attemptsUsed: 6 - gameState.attemptsLeft,
@@ -351,7 +351,7 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
         targetWord: gameState.targetWord,
         mode: gameMode,
         difficulty: difficulty,
-        hintsUsed: 0, // 可以追踪提示使用情况
+        hintsUsed: 0, // Can be tracked in the future
         score
       });
 
@@ -415,12 +415,12 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
     }
   }, [gameState?.guesses.length, guessCount, currentSessionId, recordGuess]);
 
-  // 监听新成就解锁
+  // Listen for new achievement unlocks
   useEffect(() => {
     const nextAchievement = getNextAchievement();
     if (nextAchievement && nextAchievement !== currentAchievement) {
       setCurrentAchievement(nextAchievement);
-      // 显示成就通知
+      // Show achievement notification
       setTimeout(() => {
         clearNewAchievements();
         setCurrentAchievement(null);
@@ -891,7 +891,7 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
   return (
     <>
       {mainContent}
-      {/* 成就通知 */}
+      {/* Achievement Notification */}
       <AchievementNotification
         achievement={currentAchievement}
         onClose={() => {
@@ -900,7 +900,7 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
         }}
       />
 
-      {/* 全屏提示面板 */}
+      {/* Fullscreen Hint Panel */}
       {showHints && gameState && (
         <HintPanel
           grid={gameState.grid}
@@ -912,158 +912,6 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
           compact={false}
         />
       )}
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white mt-8 py-6 border-t border-gray-800">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-          <div>
-            <h4 className="text-lg font-semibold text-white mb-4">快速链接</h4>
-            <div className="space-y-4">
-              <div className="flex flex-col space-y-2">
-                <a
-                  href="#privacy"
-                  className="text-blue-300 hover:text-blue-400 p-4 rounded-lg hover:bg-blue-900 transition-colors flex items-center gap-2"
-                >
-                  <Shield className="w-5 h-5 text-blue-300" />
-                  <div>
-                    <div className="text-white font-medium">隐私政策</div>
-                    <div className="text-blue-100 text-sm">保护您的数据</div>
-                  </div>
-                </a>
-              </div>
-              <div className="flex flex-col space-y-2">
-                <a
-                  href="#terms"
-                  className="text-blue-300 hover:text-blue-400 p-4 rounded-lg hover:bg-blue-900 transition-colors flex items-center gap-2"
-                >
-                  <Scale className="w-5 h-5 text-blue-300" />
-                  <div>
-                    <div className="text-white font-medium">服务条款</div>
-                    <div className="text-blue-100 text-sm">使用规则和责任</div>
-                  </div>
-                </a>
-              </div>
-              <div className="flex flex-col space-y-2">
-                <a
-                  href="#about"
-                  className="text-blue-300 hover:text-blue-400 p-4 rounded-lg hover:bg-blue-900 transition-colors flex items-center gap-2"
-                >
-                  <Info className="w-5 h-5 text-blue-300" />
-                  <div>
-                    <div className="text-white font-medium">关于我们</div>
-                    <div className="text-blue-100 text-sm">了解团队和愿景</div>
-                  </div>
-                </a>
-              </div>
-              <div className="flex flex-col space-y-2">
-                <button
-                  onClick={() => setCurrentView('contact')}
-                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                >
-                  <Mail className="w-5 h-5" />
-                  <div>
-                    <div className="text-white font-medium">联系客服</div>
-                    <div className="text-blue-100 text-sm">24/7在线支持</div>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-          <div>
-            <h4 className="text-lg font-semibold text-white mb-4">游戏统计</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white rounded-lg p-6 text-center">
-                <div className="text-3xl font-bold text-blue-900 mb-2">10K+</div>
-                <div className="text-gray-300 text-sm">日活跃用户</div>
-              </div>
-              <div className="bg-green-50 rounded-lg p-6 text-center">
-                <div className="text-3xl font-bold text-green-900 mb-2">50K+</div>
-                <div className="text-gray-300 text-sm">总游戏次数</div>
-              </div>
-              <div className="bg-purple-50 rounded-lg p-6 text-center">
-                <div className="text-3xl font-bold text-purple-900 mb-2">1M+</div>
-                <div className="text-gray-300 text-sm">成功猜中率</div>
-              </div>
-              <div className="bg-yellow-50 rounded-lg p-6 text-center">
-                <div className="text-3xl font-bold text-yellow-900 mb-2">100K+</div>
-                <div className="text-gray-300 text-sm">完美游戏记录</div>
-              </div>
-            </div>
-
-          <div>
-            <h4 className="text-lg font-semibold text-white mb-4">游戏成就</h4>
-            <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg p-6 text-center">
-              <Trophy className="w-8 h-8 text-yellow-400" />
-              <div className="text-2xl font-bold text-white mb-2">300+ 解锁成就</div>
-              <div className="text-gray-300 text-sm mb-2">见证您的成长历程</div>
-              <div className="mt-4 space-y-2">
-                <div className="bg-white/10 rounded-lg p-4 text-gray-800">
-                  <div className="text-sm font-medium">🎯 初学者</div>
-                  <p>完成10局游戏</p>
-                </div>
-                <div className="bg-white/10 rounded-lg p-4 text-gray-800">
-                  <div className="text-sm font-medium">🧠 策略家</div>
-                  <p>连续7日正确猜测</p>
-                </div>
-                <div className="bg-white/10 rounded-lg p-4 text-gray-800">
-                  <div className="text-sm font-medium">🏆 词汇大师</div>
-                  <p>掌握100+单词</p>
-                </div>
-              </div>
-              <div className="bg-white/10 rounded-lg p-4 text-gray-800">
-                  <div className="text-sm font-medium">👑 游戏传奇</div>
-                  <p>创造1000+完美记录</p>
-                </div>
-              </div>
-            </div>
-
-          <div>
-            <h4 className="text-lg font-semibold text-white mb-4">社区数据</h4>
-            <div className="bg-white rounded-lg p-6 text-center">
-              <div className="text-3xl font-bold text-white mb-2">500K+</div>
-              <div className="text-gray-300 text-sm">社区成员</div>
-              </div>
-              <div className="bg-green-50 rounded-lg p-6 text-center">
-                <div className="text-3xl font-bold text-green-900 mb-2">100K+</div>
-                <div className="text-gray-300 text-sm">日均游戏时长</div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 text-center">
-              <div className="text-3xl font-bold text-purple-900 mb-2">50M+</div>
-                <div className="text-gray-300 text-sm">平均准确率</div>
-              </div>
-              <div className="bg-yellow-50 rounded-lg p-6 text-center">
-                <div className="text-3xl font-bold text-yellow-900 mb-2">85%</div>
-                <div className="text-gray-300 text-sm">最高连胜</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 pt-4 border-t border-gray-700">
-            <div className="text-center text-gray-500 text-sm">
-              <div className="mb-2">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full mb-4">
-                  <span className="text-4xl font-bold text-white">PW</span>
-                </div>
-                <div className="text-gray-500 text-sm mt-2">
-                  <Globe className="w-6 h-6 inline mr-1" />
-                  全球玩家社区
-                </div>
-              </div>
-
-            <div className="flex justify-center gap-4 mt-6">
-              <div className="text-center">
-                <p className="text-gray-400 text-sm mb-2">
-                  © 2025 PathWordle. 保留所有权利。
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
     </>
   );
 };

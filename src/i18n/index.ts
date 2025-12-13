@@ -1,12 +1,11 @@
 import en from './locales/en.json';
-import zh from './locales/zh.json';
 import es from './locales/es.json';
 import fr from './locales/fr.json';
 import de from './locales/de.json';
 import ja from './locales/ja.json';
 import ko from './locales/ko.json';
 
-export type Language = 'en' | 'zh' | 'es' | 'fr' | 'de' | 'ja' | 'ko';
+export type Language = 'en' | 'es' | 'fr' | 'de' | 'ja' | 'ko';
 
 export interface TranslationKeys {
   // Navigation and UI
@@ -306,7 +305,6 @@ export interface TranslationKeys {
 
 export const translations: Record<Language, TranslationKeys> = {
   en,
-  zh,
   es,
   fr,
   de,
@@ -316,11 +314,10 @@ export const translations: Record<Language, TranslationKeys> = {
 
 export const defaultLanguage: Language = 'en';
 
-export const supportedLanguages: Language[] = ['en', 'zh', 'es', 'fr', 'de', 'ja', 'ko'];
+export const supportedLanguages: Language[] = ['en', 'es', 'fr', 'de', 'ja', 'ko'];
 
 export const languageNames: Record<Language, string> = {
   en: 'English',
-  zh: '中文',
   es: 'Español',
   fr: 'Français',
   de: 'Deutsch',
@@ -330,7 +327,6 @@ export const languageNames: Record<Language, string> = {
 
 export const languageFlags: Record<Language, string> = {
   en: '🇺🇸',
-  zh: '🇨🇳',
   es: '🇪🇸',
   fr: '🇫🇷',
   de: '🇩🇪',
