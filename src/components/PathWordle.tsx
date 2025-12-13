@@ -207,7 +207,7 @@ CurrentPathDisplay.displayName = 'CurrentPathDisplay';
 
 const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty = 'medium' }) => {
   // ALL HOOKS MUST BE DECLARED BEFORE ANY CONDITIONAL RETURNS
-  const { gameState, selectCell, submitGuess, clearPath, resetGame, canSubmit } = usePathWordle(gameMode);
+  const { gameState, selectCell, submitGuess, clearPath, resetGame, canSubmit, useNextLetterHint } = usePathWordle(gameMode);
   const { recordGame, shareResult, getNextAchievement, clearNewAchievements, statistics } = useStatistics();
   // Temporarily disabled learning analytics to fix crashes
   // const {
@@ -351,7 +351,7 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
         targetWord: gameState.targetWord,
         mode: gameMode,
         difficulty: difficulty,
-        hintsUsed: 0, // Can be tracked in the future
+        hintsUsed: gameState.hintUsed ? 1 : 0,
         score
       });
 
@@ -836,9 +836,19 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
                 currentPathLength={gameState.currentPath.length}
                 onSubmit={handleSubmit}
                 onClear={handleClear}
+                onHint={useNextLetterHint}
                 attemptsLeft={gameState.attemptsLeft}
+                hintUsed={gameState.hintUsed}
               />
             </div>
+
+            {gameState.revealedHintLetter && (
+              <div className="mt-4 text-center">
+                <p className="text-lg font-semibold text-gray-700">
+                  Hint: The next letter is <span className="text-2xl font-bold text-green-500">{gameState.revealedHintLetter}</span>
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Guess History */}

@@ -41,7 +41,9 @@ export const usePathWordle = (gameMode: 'daily' | 'practice' = 'daily') => {
       attemptsLeft: MAX_ATTEMPTS,
       gameStatus: 'playing' as const,
       currentDate: today,
-      gameMode
+      gameMode,
+      hintUsed: false,
+      revealedHintLetter: null
     };
   });
 
@@ -233,7 +235,9 @@ export const usePathWordle = (gameMode: 'daily' | 'practice' = 'daily') => {
       attemptsLeft: MAX_ATTEMPTS,
       gameStatus: 'playing',
       currentDate: today,
-      gameMode
+      gameMode,
+      hintUsed: false,
+      revealedHintLetter: null
     };
     
     setGameState(newState);
@@ -242,12 +246,42 @@ export const usePathWordle = (gameMode: 'daily' | 'practice' = 'daily') => {
     }
   }, [gameMode]);
 
+  const useNextLetterHint = useCallback(() => {
+    if (gameState.hintUsed || gameState.gameStatus !== 'playing') return;
+
+    const { targetWord, guesses } = gameState;
+    const correctLetters = new Set<string>();
+    const presentLetters = new Set<string>();
+
+    guesses.forEach(guess => {
+      guess.feedback.forEach((status, index) => {
+        if (status === 'correct') {
+          correctLetters.add(guess.word[index]);
+        } else if (status === 'present') {
+          presentLetters.add(guess.word[index]);
+        }
+      });
+    });
+
+    for (const letter of targetWord) {
+      if (!correctLetters.has(letter) && !presentLetters.has(letter)) {
+        setGameState(prev => ({
+          ...prev,
+          hintUsed: true,
+          revealedHintLetter: letter.toUpperCase()
+        }));
+        return;
+      }
+    }
+  }, [gameState.hintUsed, gameState.gameStatus, gameState.targetWord, gameState.guesses]);
+
   return {
     gameState,
     selectCell,
     submitGuess,
     clearPath,
     resetGame,
+    useNextLetterHint,
     canSubmit: gameState.currentPath.length === 5 && gameState.gameStatus === 'playing'
   };
 };

@@ -1,12 +1,14 @@
 import React from 'react';
-import { Trash2, Send } from 'lucide-react';
+import { Trash2, Send, Lightbulb } from 'lucide-react';
 
 interface GameControlsProps {
   canSubmit: boolean;
   currentPathLength: number;
   onSubmit: () => void;
   onClear: () => void;
+  onHint: () => void;
   attemptsLeft: number;
+  hintUsed: boolean;
 }
 
 const GameControls: React.FC<GameControlsProps> = ({
@@ -14,7 +16,9 @@ const GameControls: React.FC<GameControlsProps> = ({
   currentPathLength,
   onSubmit,
   onClear,
-  attemptsLeft
+  onHint,
+  attemptsLeft,
+  hintUsed
 }) => {
   return (
     <div className="flex flex-col items-center gap-4">
@@ -42,6 +46,20 @@ const GameControls: React.FC<GameControlsProps> = ({
           Clear
         </button>
         
+        <button
+          onClick={onHint}
+          disabled={hintUsed}
+          className="
+            flex items-center gap-2 px-4 py-2 rounded-lg
+            bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300
+            text-white font-medium transition-colors duration-200
+            disabled:cursor-not-allowed
+          "
+        >
+          <Lightbulb size={16} />
+          Hint
+        </button>
+
         <button
           onClick={onSubmit}
           disabled={!canSubmit}

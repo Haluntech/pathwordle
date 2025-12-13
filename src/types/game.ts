@@ -16,6 +16,8 @@ export interface GameState {
   gameStatus: 'playing' | 'won' | 'lost';
   currentDate: string;
   gameMode: 'daily' | 'practice';
+  hintUsed: boolean;
+  revealedHintLetter: string | null;
 }
 
 export interface GuessResult {
