@@ -291,7 +291,6 @@ body {
   user-select: none;
   white-space: nowrap;
   -webkit-appearance: none;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .btn:focus {

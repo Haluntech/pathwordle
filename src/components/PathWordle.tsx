@@ -19,7 +19,7 @@ import Friends from './Friends';
 import Multiplayer from './Multiplayer';
 import ThemeSelector from './ThemeSelector';
 import PuzzleCreator from './PuzzleCreator';
-import NotificationSettingsSimple from './NotificationSettingsSimple';
+import NotificationSettings from './NotificationSettings';
 import ABTestingAdmin from './ABTestingAdmin';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
@@ -522,16 +522,6 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
     );
   }
 
-  // Show notification settings
-  if (showNotificationSettings) {
-    return (
-      <NotificationSettingsSimple
-        isVisible={showNotificationSettings}
-        onClose={() => setShowNotificationSettings(false)}
-      />
-    );
-  }
-
   // Show loading state if game state is not ready
   if (!gameState || !gameState.grid || gameState.grid.length === 0) {
     return (
@@ -693,18 +683,13 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
             <button
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
               className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              aria-label={showNotificationSettings ? 'Hide Notification Settings (Premium)' : 'Show Notification Settings (Premium)'}
+              aria-label={showNotificationSettings ? 'Hide Notification Settings' : 'Show Notification Settings'}
               aria-expanded={showNotificationSettings}
-              title="Notification Settings - Premium Feature Coming Soon"
+              title="Notification Settings"
               data-feature="notification-settings"
             >
               <Bell className="w-5 h-5 text-orange-600" />
               <span className="hidden sm:inline font-medium">Notifications</span>
-              <ComingSoonBadge
-                feature="Notification Settings"
-                icon={<Bell className="w-5 h-5 text-orange-600" />}
-                size="sm"
-              />
             </button>
             <button
               onClick={() => setShowABTesting(!showABTesting)}
@@ -802,12 +787,6 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
           </div>
         )}
 
-        {/* Notification Settings Panel */}
-        {showNotificationSettings && (
-          <div className="mb-8">
-            <NotificationSettings />
-          </div>
-        )}
 
         {/* A/B Testing Panel */}
         {showABTesting && (
@@ -858,6 +837,14 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
         </div>
 
         <HowToPlay />
+
+        {/* Notification Settings Modal */}
+        {showNotificationSettings && (
+          <NotificationSettings
+            isVisible={showNotificationSettings}
+            onClose={() => setShowNotificationSettings(false)}
+          />
+        )}
 
         {/* Game Result Modal */}
         {(gameState.gameStatus === 'won' || gameState.gameStatus === 'lost') && (
