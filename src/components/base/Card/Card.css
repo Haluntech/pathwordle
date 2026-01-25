@@ -1,0 +1,282 @@
+/**
+ * Card Component Styles
+ */
+
+.card {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: all 0.15s ease-in-out;
+}
+
+/* Card Variants */
+.card-default {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.card-bordered {
+  border-width: 2px;
+  box-shadow: none;
+}
+
+.card-shadow {
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.card-flat {
+  border: none;
+  box-shadow: none;
+  background-color: #f9fafb;
+}
+
+/* Hoverable */
+.card-hoverable {
+  cursor: pointer;
+}
+
+.card-hoverable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Clickable */
+.card-clickable {
+  cursor: pointer;
+}
+
+.card-clickable:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.card-clickable:active {
+  transform: translateY(0);
+}
+
+/* Card Header */
+.card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.5;
+}
+
+.card-title.h1 {
+  font-size: 2rem;
+}
+
+.card-title.h2 {
+  font-size: 1.5rem;
+}
+
+.card-title.h4 {
+  font-size: 1rem;
+}
+
+.card-title.h5 {
+  font-size: 0.875rem;
+}
+
+.card-title.h6 {
+  font-size: 0.75rem;
+}
+
+.card-subtitle {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* Card Body */
+.card-body {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+/* Card Footer */
+.card-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+/* Card Image */
+.card-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.card-img-top {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.card-img-bottom {
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Card Grid */
+.card-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.card-grid-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.card-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.card-grid-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.card-grid-gap-sm {
+  gap: 0.5rem;
+}
+
+.card-grid-gap-md {
+  gap: 1rem;
+}
+
+.card-grid-gap-lg {
+  gap: 1.5rem;
+}
+
+/* Responsive Grid */
+@media (max-width: 1024px) {
+  .card-grid-3,
+  .card-grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .card-grid-2,
+  .card-grid-3,
+  .card-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsive Card Padding */
+@media (max-width: 640px) {
+  .card-header,
+  .card-body,
+  .card-footer {
+    padding: 1rem;
+  }
+}
+
+/* Card Group (connected cards) */
+.card-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.card-group > .card {
+  border-radius: 0;
+}
+
+.card-group > .card:not(:first-child) {
+  border-top: none;
+}
+
+.card-group > .card:first-child {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.card-group > .card:last-child {
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
+
+/* Horizontal Card (flex layout) */
+.card-horizontal {
+  display: flex;
+  flex-direction: row;
+}
+
+.card-horizontal > .card-img {
+  width: 12rem;
+  object-fit: cover;
+}
+
+.card-horizontal > .card-body {
+  flex: 1;
+}
+
+/* Card with Badge */
+.card-with-badge {
+  position: relative;
+}
+
+.card-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading Skeleton */
+.card-skeleton {
+  background: linear-gradient(
+    90deg,
+    #f3f4f6 0%,
+    #e5e7eb 50%,
+    #f3f4f6 100%
+  );
+  background-size: 200% 100%;
+  animation: card-skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes card-skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Card Actions */
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card-hoverable,
+  .card-skeleton {
+    transition: none;
+    animation: none;
+  }
+}

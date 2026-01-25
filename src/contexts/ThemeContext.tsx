@@ -35,7 +35,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <div className={`theme-${theme.currentTheme.type}`} data-theme={theme.currentTheme.id}>
+      <div className={`theme-${theme.currentTheme.type}`} data-theme={theme.currentTheme.type}>
         {children}
       </div>
     </ThemeContext.Provider>

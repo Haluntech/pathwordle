@@ -2,31 +2,19 @@ import React, { useState, useEffect, useMemo, memo, useCallback } from 'react';
 import pathwordleLogo from '../assets/pathwordle_logo.png';
 import { usePathWordle } from '../hooks/usePathWordle';
 import { useStatistics } from '../hooks/useStatistics';
-// import { useLearningAnalytics } from '../hooks/useLearningAnalytics';
 import Grid from './Grid';
 import GuessHistory from './GuessHistory';
 import GameControls from './GameControls';
 import GameResult from './GameResult';
 import Statistics from './Statistics';
-// import LearningDashboard from './LearningDashboard';
-import TimeChallengeModeSimple from './TimeChallengeModeSimple';
-import ThemedPuzzleModeSimple from './ThemedPuzzleModeSimple';
-import ComingSoonBadge from './ComingSoonBadge';
 import AchievementNotification, { useAchievementNotifications } from './AchievementNotification';
 import HintPanel from './HintPanel';
-// import Leaderboard from './Leaderboard';
 import Friends from './Friends';
 import Multiplayer from './Multiplayer';
 import ThemeSelector from './ThemeSelector';
-import PuzzleCreator from './PuzzleCreator';
-import NotificationSettingsSimple from './NotificationSettingsSimple';
-import ABTestingAdmin from './ABTestingAdmin';
-import PrivacyPolicy from './PrivacyPolicy';
-import TermsOfService from './TermsOfService';
-import ContactPage from './ContactPage';
 import { pathToWord } from '../utils/gameLogic';
 import ContentQualityPanel from './ContentQualityPanel';
-import { BarChart3, Trophy, Lightbulb, Globe, Users, Swords, Palette, Brain, Clock, BookOpen, Plus, Bell, FlaskConical } from 'lucide-react';
+import { BarChart3, Trophy, Lightbulb, Globe, Users, Swords, Palette, BookOpen } from 'lucide-react';
 
 interface PathWordleProps {
   gameMode?: 'daily' | 'practice';
@@ -206,35 +194,13 @@ const CurrentPathDisplay = memo(({
 CurrentPathDisplay.displayName = 'CurrentPathDisplay';
 
 const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty = 'medium' }) => {
-  // ALL HOOKS MUST BE DECLARED BEFORE ANY CONDITIONAL RETURNS
+  // Core hooks
   const { gameState, selectCell, submitGuess, clearPath, resetGame, canSubmit } = usePathWordle(gameMode);
   const { recordGame, shareResult, getNextAchievement, clearNewAchievements, statistics } = useStatistics();
-  // Temporarily disabled learning analytics to fix crashes
-  // const {
-  //   startSession,
-  //   endSession,
-  //   recordGuess,
-  //   recordLearningEvent,
-  //   getAnalytics,
-  //   getRecommendations,
-  //   getSessionHistory
-  // } = useLearningAnalytics({
-  //   trackingEnabled: true,
-  //   dataRetentionDays: 90
-  // });
-
-  // Mock functions to avoid crashes
-  const startSession = (config: any) => 'mock_session';
-  const endSession = (sessionId: string, result: any) => {};
-  const recordGuess = (sessionId: string, guess: any) => {};
-  const recordLearningEvent = (sessionId: string, event: any) => {};
-  const getAnalytics = () => ({ sessions: [], performance: {} });
-  const getRecommendations = () => [];
-  const getSessionHistory = () => [];
   const { AchievementNotificationComponent } = useAchievementNotifications();
   const [showContentQuality, setShowContentQuality] = useState(false);
 
-  // State hooks - all at the top
+  // State hooks
   const [error, setError] = useState<string | null>(null);
   const [showStatistics, setShowStatistics] = useState(false);
   const [showHints, setShowHints] = useState(false);
@@ -242,33 +208,7 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
   const [showFriends, setShowFriends] = useState(false);
   const [showMultiplayer, setShowMultiplayer] = useState(false);
   const [showThemeSelector, setShowThemeSelector] = useState(false);
-  const [showLearningDashboard, setShowLearningDashboard] = useState(false);
-  const [showTimeChallenge, setShowTimeChallenge] = useState(false);
-  const [showThemedPuzzles, setShowThemedPuzzles] = useState(false);
-  const [showPuzzleCreator, setShowPuzzleCreator] = useState(false);
-  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
-  const [showABTesting, setShowABTesting] = useState(false);
-  const [currentView, setCurrentView] = useState<'game' | 'timeChallenge' | 'themedPuzzles'>('game');
-
-  // Optimized UI state - reduce unnecessary re-renders
-  const [uiState, setUIState] = useState({
-    showStatistics: false,
-    showHints: false,
-    showLeaderboard: false,
-    showFriends: false,
-    showMultiplayer: false,
-    showThemeSelector: false,
-    showLearningDashboard: false,
-    showTimeChallenge: false,
-    showThemedPuzzles: false,
-    showPuzzleCreator: false,
-    showNotificationSettings: false,
-    showABTesting: false,
-    currentView: 'game'
-  });
   const [gameStartTime, setGameStartTime] = useState<number>(Date.now());
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [guessCount, setGuessCount] = useState(0);
   const [currentAchievement, setCurrentAchievement] = useState(null);
 
   // Memoize current word calculation
@@ -301,41 +241,10 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
     setGameStartTime(Date.now());
   }, [resetGame]);
 
-  // Record learning events
-  const recordLearningEvents = useCallback(() => {
-    if (!currentSessionId || !gameState) return;
-
-    // Record pattern recognition events
-    if (guessCount > 0 && guessCount % 3 === 0) {
-      recordLearningEvent(currentSessionId, {
-        type: 'pattern_recognized',
-        data: {
-          pattern: 'letter_positioning',
-          skillArea: 'PATTERN_RECOGNITION',
-          confidence: Math.min(0.5 + (guessCount * 0.1), 1.0),
-          details: 'Player showing improvement in letter positioning'
-        }
-      });
-    }
-
-    // Record skill improvements on good performance
-    if (gameState.gameStatus === 'won' && gameState.attemptsLeft >= 3) {
-      recordLearningEvent(currentSessionId, {
-        type: 'skill_improvement',
-        data: {
-          skillArea: 'PROBLEM_SOLVING',
-          previousSkill: 0.6,
-          newSkill: 0.7,
-          details: 'Excellent performance with efficient word solving'
-        }
-      });
-    }
-  }, [currentSessionId, gameState, guessCount, recordLearningEvent]);
-
   // Handle game completion
   useEffect(() => {
     if (gameState && (gameState.gameStatus === 'won' || gameState.gameStatus === 'lost')) {
-      const timeTaken = Math.round((Date.now() - gameStartTime) / 1000); // Convert to seconds
+      const timeTaken = Math.round((Date.now() - gameStartTime) / 1000);
 
       // Calculate score
       let score = 0;
@@ -351,69 +260,11 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
         targetWord: gameState.targetWord,
         mode: gameMode,
         difficulty: difficulty,
-        hintsUsed: 0, // Can be tracked in the future
+        hintsUsed: 0,
         score
       });
-
-      // Record learning events for game completion
-      recordLearningEvents();
-
-      // End the learning analytics session
-      if (currentSessionId && (gameState.gameStatus === 'won' || gameState.gameStatus === 'lost')) {
-        endSession(currentSessionId, {
-          gameOutcome: gameState.gameStatus,
-          finalScore: score,
-          timeSpent: timeTaken,
-          efficiency: score > 0 ? score / timeTaken : 0,
-          skillGains: {
-            vocabulary: gameState.gameStatus === 'won' ? 0.1 : 0.05,
-            pattern_recognition: 0.08,
-            logical_reasoning: gameState.gameStatus === 'won' ? 0.12 : 0.06
-          }
-        });
-      }
     }
-  }, [gameState?.gameStatus, gameState?.targetWord, gameState?.attemptsLeft, gameMode, difficulty, gameStartTime, recordGame, recordLearningEvents, currentSessionId, endSession]);
-
-  // Initialize learning analytics session
-  useEffect(() => {
-    const sessionId = startSession({
-      gameMode,
-      difficulty
-    });
-    setCurrentSessionId(sessionId);
-    setGameStartTime(Date.now());
-    setGuessCount(0);
-
-    return () => {
-      if (sessionId) {
-        // Provide a default result for cleanup - this is called when component unmounts
-        endSession(sessionId, {
-          gameOutcome: 'lost', // Default to lost when component unmounts
-          finalScore: 0,
-          timeSpent: Math.round((Date.now() - gameStartTime) / 1000),
-          efficiency: 0
-        });
-      }
-    };
-  }, [gameMode, difficulty, startSession, endSession]);
-
-  // Track guess submissions for learning analytics
-  useEffect(() => {
-    if (gameState && gameState.guesses.length > guessCount && currentSessionId) {
-      const newGuesses = gameState.guesses.slice(guessCount);
-      newGuesses.forEach(guess => {
-        recordGuess(currentSessionId, {
-          word: guess.word,
-          feedback: guess.feedback,
-          timeTaken: 0, // Could be tracked with timestamps
-          hintsUsed: 0,
-          accuracy: guess.feedback.filter(f => f.status === 'correct').length / 5
-        });
-      });
-      setGuessCount(gameState.guesses.length);
-    }
-  }, [gameState?.guesses.length, guessCount, currentSessionId, recordGuess]);
+  }, [gameState?.gameStatus, gameState?.targetWord, gameState?.attemptsLeft, gameMode, difficulty, gameStartTime, recordGame]);
 
   // Listen for new achievement unlocks
   useEffect(() => {
@@ -428,10 +279,8 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
     }
   }, [statistics, getNextAchievement, clearNewAchievements, currentAchievement]);
 
+  // Validate game state
   useEffect(() => {
-    if (__DEV__) {
-      console.log('PathWordle component mounted with gameState:', gameState);
-    }
     if (!gameState) {
       setError('Failed to initialize game state');
     } else if (!gameState.grid || gameState.grid.length === 0) {
@@ -486,52 +335,6 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
     return <ErrorBoundary error={error} onReset={handleReset} />;
   }
 
-  // Show different views based on currentView
-  if (currentView === 'timeChallenge') {
-    return (
-      <TimeChallengeModeSimple
-        playerId="player_123" // In real app, this would come from auth context
-        onBack={() => {
-          setCurrentView('game');
-          setShowTimeChallenge(false);
-        }}
-      />
-    );
-  }
-
-  if (currentView === 'themedPuzzles') {
-    return (
-      <ThemedPuzzleModeSimple
-        playerId="player_123" // In real app, this would come from auth context
-        onBack={() => {
-          setCurrentView('game');
-          setShowThemedPuzzles(false);
-        }}
-      />
-    );
-  }
-
-  // Show puzzle creator
-  if (showPuzzleCreator) {
-    return (
-      <PuzzleCreator
-        creatorId="creator_123" // In real app, this would come from auth context
-        creatorName="Player" // In real app, this would come from user profile
-        onClose={() => setShowPuzzleCreator(false)}
-      />
-    );
-  }
-
-  // Show notification settings
-  if (showNotificationSettings) {
-    return (
-      <NotificationSettingsSimple
-        isVisible={showNotificationSettings}
-        onClose={() => setShowNotificationSettings(false)}
-      />
-    );
-  }
-
   // Show loading state if game state is not ready
   if (!gameState || !gameState.grid || gameState.grid.length === 0) {
     return (
@@ -565,16 +368,11 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
           <div className="flex items-center justify-between mb-8">
             <GameHeader gameMode={gameMode} />
             <div className="flex items-center gap-2 flex-wrap">
-              {/* Enhanced Hints button with SEO and quality improvement */}
               <button
                 onClick={() => setShowHints(!showHints)}
                 className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 aria-label={showHints ? 'Hide hints and word tips' : 'Show hints and word tips'}
                 aria-expanded={showHints}
-                title={showHints ? 'Hide word solving assistance' : 'Get help with word patterns, definitions, and learning tips'}
-                role="button"
-                itemProp="description"
-                data-feature="word-assistance"
               >
                 <Lightbulb className="w-5 h-5 text-yellow-500" />
                 <span className="hidden sm:inline font-medium">Word Tips</span>
@@ -600,7 +398,6 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
                 <span className="hidden sm:inline font-medium">Leaderboard</span>
               </button>
             )}
-
             <button
               onClick={() => setShowFriends(!showFriends)}
               className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -610,7 +407,6 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
               <Users className="w-5 h-5" />
               <span className="hidden sm:inline font-medium">Friends</span>
             </button>
-
             <button
               onClick={() => setShowMultiplayer(!showMultiplayer)}
               className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -620,7 +416,6 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
               <Swords className="w-5 h-5" />
               <span className="hidden sm:inline font-medium">Battle</span>
             </button>
-
             <button
               onClick={() => setShowThemeSelector(!showThemeSelector)}
               className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -629,92 +424,6 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
             >
               <Palette className="w-5 h-5" />
               <span className="hidden sm:inline font-medium">Themes</span>
-            </button>
-
-            <button
-              onClick={() => setShowLearningDashboard(!showLearningDashboard)}
-              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              aria-label={showLearningDashboard ? 'Hide Learning Analytics' : 'Show Learning Analytics'}
-              aria-expanded={showLearningDashboard}
-            >
-              <Brain className="w-5 h-5 text-indigo-600" />
-              <span className="hidden sm:inline font-medium">Learning</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setShowTimeChallenge(!showTimeChallenge);
-                setCurrentView(showTimeChallenge ? 'game' : 'timeChallenge');
-              }}
-              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              aria-label={showTimeChallenge ? 'Hide Time Challenge (Premium)' : 'Show Time Challenge (Premium)'}
-              title="Time Challenge Mode - Premium Feature Coming Soon"
-              aria-expanded={showTimeChallenge}
-            >
-              <Clock className="w-5 h-5 text-orange-600" />
-              <span className="hidden sm:inline font-medium">Time Challenge</span>
-              <ComingSoonBadge
-                feature="Time Challenge"
-                icon={<Clock className="w-5 h-5 text-orange-600" />}
-                size="sm"
-              />
-            </button>
-
-            <button
-              onClick={() => {
-                setShowThemedPuzzles(!showThemedPuzzles);
-                setCurrentView(showThemedPuzzles ? 'game' : 'themedPuzzles');
-              }}
-              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-              aria-label={showThemedPuzzles ? 'Hide Themed Puzzles' : 'Show Themed Puzzles'}
-              aria-expanded={showThemedPuzzles}
-            >
-              <div className="relative">
-                <BookOpen className="w-5 h-5 text-green-600" />
-                <span className="hidden sm:inline font-medium">Themed Puzzles</span>
-                <ComingSoonBadge
-                  feature="Themed Puzzles"
-                  icon={<BookOpen className="w-4 h-4 text-green-600" />}
-                  size="sm"
-                />
-              </div>
-            </button>
-            <button
-              onClick={() => setShowPuzzleCreator(!showPuzzleCreator)}
-              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              aria-label={showPuzzleCreator ? 'Hide Puzzle Editor' : 'Show Puzzle Editor (Premium)'}
-              title="Puzzle Editor - Premium Feature Coming Soon"
-              data-feature="puzzle-creator"
-              aria-expanded={showPuzzleCreator}
-            >
-              <Plus className="w-5 h-5 text-purple-600" />
-              <span className="hidden sm:inline font-medium">Create Puzzle</span>
-            </button>
-            <button
-              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
-              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              aria-label={showNotificationSettings ? 'Hide Notification Settings (Premium)' : 'Show Notification Settings (Premium)'}
-              aria-expanded={showNotificationSettings}
-              title="Notification Settings - Premium Feature Coming Soon"
-              data-feature="notification-settings"
-            >
-              <Bell className="w-5 h-5 text-orange-600" />
-              <span className="hidden sm:inline font-medium">Notifications</span>
-              <ComingSoonBadge
-                feature="Notification Settings"
-                icon={<Bell className="w-5 h-5 text-orange-600" />}
-                size="sm"
-              />
-            </button>
-            <button
-              onClick={() => setShowABTesting(!showABTesting)}
-              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-pink-500"
-              aria-label={showABTesting ? 'Hide A/B Testing (Premium)' : 'Show A/B Testing (Premium)'}
-              title="A/B Testing - Premium Feature Coming Soon"
-              aria-expanded={showABTesting}
-            >
-              <FlaskConical className="w-5 h-5 text-pink-600" />
-              <span className="hidden sm:inline font-medium">A/B Testing</span>
             </button>
           </div>
         </div>
@@ -769,50 +478,6 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
         {showThemeSelector && (
           <div className="mb-8">
             <ThemeSelector />
-          </div>
-        )}
-
-        {/* Learning Dashboard Panel - Temporarily disabled */}
-        {showLearningDashboard && (
-          <div className="mb-8">
-            <div className="bg-white rounded-lg shadow-lg p-6 text-center">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Learning Analytics</h3>
-              <p className="text-gray-600 mb-4">Learning analytics are temporarily disabled while we improve the system.</p>
-              <button
-                onClick={() => setShowLearningDashboard(false)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Themed Puzzles Panel */}
-        {showThemedPuzzles && (
-          <div className="mb-8">
-            <ThemedPuzzleModeSimple />
-          </div>
-        )}
-
-        {/* Puzzle Creator Panel */}
-        {showPuzzleCreator && (
-          <div className="mb-8">
-            <PuzzleCreator />
-          </div>
-        )}
-
-        {/* Notification Settings Panel */}
-        {showNotificationSettings && (
-          <div className="mb-8">
-            <NotificationSettings />
-          </div>
-        )}
-
-        {/* A/B Testing Panel */}
-        {showABTesting && (
-          <div className="mb-8">
-            <ABTestingAdmin />
           </div>
         )}
 
@@ -882,10 +547,12 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
   gameState?.targetWord,
   handleReset,
   showStatistics,
-  showLearningDashboard,
-  getAnalytics,
-  getRecommendations,
-  getSessionHistory
+  showThemeSelector,
+  showFriends,
+  showMultiplayer,
+  showLeaderboard,
+  showHints,
+  showContentQuality
 ]);
 
   return (
