@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, memo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePathWordle } from '../hooks/usePathWordle';
 import { useStatistics } from '../hooks/useStatistics';
 import Grid from './Grid';
@@ -66,12 +67,18 @@ const TopAppBar = memo(({
   isDarkMode: boolean;
   onToggleTheme: () => void;
   onShowHints: () => void;
-}) => (
+}) => {
+  const navigate = useNavigate();
+
+  return (
   <header className="bg-background sticky top-0 z-50">
     <div className="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
-      <div className="text-2xl font-black text-primary tracking-tighter italic font-headline uppercase">
+      <button
+        onClick={() => navigate('/')}
+        className="text-2xl font-black text-primary tracking-tighter italic font-headline uppercase hover:opacity-80 transition-opacity cursor-pointer"
+      >
         PathWordle
-      </div>
+      </button>
       <div className="flex items-center gap-6">
         {/* Game Mode Toggle */}
         <div className="relative group">
@@ -151,7 +158,8 @@ const TopAppBar = memo(({
     </div>
     <div className="bg-surface-container-low h-[1px] w-full"></div>
   </header>
-));
+);
+});
 
 TopAppBar.displayName = 'TopAppBar';
 
