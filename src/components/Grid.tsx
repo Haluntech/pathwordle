@@ -23,15 +23,15 @@ const getCellStatusDescription = (cell: GridCell): string => {
 // Get color description for accessibility
 const getCellColorDescription = (cell: GridCell): string => {
   if (cell.isSelected) {
-    return 'Yellow background, dark text';
+    return 'Blue background, white text';
   }
   if (cell.isInPath) {
-    return 'Green background, dark text';
+    return 'Light blue background, dark blue text';
   }
   if (cell.canSelect) {
-    return 'Yellow border, dark text with glow';
+    return 'Light green background, dark green text';
   }
-  return 'Dark gray background, gray text';
+  return 'Light gray background, dark gray text';
 };
 
 const Grid: React.FC<GridProps> = ({ grid, onCellClick }) => {
@@ -75,7 +75,7 @@ const Grid: React.FC<GridProps> = ({ grid, onCellClick }) => {
 
   return (
     <div
-      className="grid grid-cols-6 grid-rows-6 gap-2 h-full w-full bg-surface-container-low p-2 rounded-xl"
+      className="grid grid-cols-6 gap-2 sm:gap-3 p-4 sm:p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/60 mx-auto"
       role="grid"
       aria-label="Game board letters"
       aria-describedby="grid-description"
@@ -97,16 +97,15 @@ const Grid: React.FC<GridProps> = ({ grid, onCellClick }) => {
               onClick={() => onCellClick(rowIndex, colIndex)}
               onKeyDown={(e) => handleKeyDown(e, rowIndex, colIndex)}
               className={`
-                md-grid-cell
+                grid-cell
                 ${cell.isSelected
-                  ? 'selected active-path-glow'
+                  ? 'selected'
                   : cell.isInPath
                   ? 'in-path'
                   : cell.canSelect
-                  ? 'available-neighbor'
-                  : ''
+                  ? 'available'
+                  : 'unavailable'
                 }
-                transition-all duration-200
               `}
               role="gridcell"
               aria-label={ariaLabel}
