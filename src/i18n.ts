@@ -72,6 +72,76 @@ const en = {
   }
 };
 
+// Chinese translations
+const zh = {
+  translation: {
+    landing: {
+      title: "PathWordle",
+      tagline: "在网格中开辟一条逻辑之路。连接字母，架起桥梁，照亮每日之路。",
+      playToday: "立即开始",
+      startPlaying: "开始游戏",
+      dailyChallenge: "每日挑战",
+      wordsCompleted: "单词完成",
+      gamesPlayed: "游戏次数",
+      winRate: "胜率",
+      currentStreak: "当前连胜",
+      days: "天",
+      howToPlay: "如何游玩",
+      howToPlaySubtitle: "4个简单步骤掌握网格",
+      step1Title: "连接字母",
+      step1Desc: "点击6×6网格上相邻的字母来构建路径。您可以水平、垂直或对角线连接。",
+      step2Title: "组成单词",
+      step2Desc: "创建一个能拼出5个字母单词的路径。字母必须按顺序连接。",
+      step3Title: "提交并发现",
+      step3Desc: "提交您的猜测并获得颜色编码反馈。绿色=正确位置，黄色=错误位置。",
+      step4Title: "掌握网格",
+      step4Desc: "使用逻辑和策略在6次或更少的尝试中猜出隐藏的单词。祝您好运！",
+      testimonials: "玩家评价",
+      testimonialsSubtitle: "加入数千名单词谜题爱好者",
+      features: "为什么选择PathWordle？",
+      featuresSubtitle: "让我们与众不同的功能",
+      readyToPlay: "准备好了吗？",
+      readyToPlayDesc: "加入数千名已经掌握网格的玩家。您的每日单词谜题冒险在等待！",
+      testimonial1Name: "陈莎拉",
+      testimonial1Role: "单词游戏爱好者",
+      testimonial1Content: "PathWordle太棒了！路径机制为策略增加了全新的层次。我现在的每日必修课。",
+      testimonial2Name: "马库斯·约翰逊",
+      testimonial2Role: "谜题爱好者",
+      testimonial2Content: "终于有一个真正能挑战我的单词游戏了。所需的空间思维太精彩了！",
+      testimonial3Name: "艾玛·威廉姆斯",
+      testimonial3Role: "休闲玩家",
+      testimonial3Content: "非常适合我的早晨咖啡时间。易学难精。我喜欢每日挑战！",
+      feature1Title: "战略游戏",
+      feature1Desc: "路径机制为经典单词谜题增加了空间推理",
+      feature2Title: "每日挑战",
+      feature2Desc: "每天新谜题。与全球朋友竞争",
+      feature3Title: "智能提示",
+      feature3Desc: "需要帮助时提供AI驱动的建议",
+      feature4Title: "追踪进度",
+      feature4Desc: "详细统计和成就来追踪您的旅程",
+      feature5Title: "深色模式",
+      feature5Desc: "具有明暗主题的精美Material Design 3界面",
+      feature6Title: "永久免费",
+      feature6Desc: "无广告，无订阅。纯粹的谜题享受"
+    },
+    game: {
+      title: "PathWordle",
+      dailyChallenge: "每日挑战",
+      attempts: "次尝试",
+      guessTheWord: "6次机会猜出今天的单词",
+      practice: "练习模式",
+      daily: "每日挑战"
+    },
+    footer: {
+      copyright: "© 2026 PathWordle. Luminous Logic Engine.",
+      privacy: "隐私",
+      terms: "条款",
+      about: "关于",
+      support: "支持"
+    }
+  }
+};
+
 // Japanese translations
 const ja = {
   translation: {
