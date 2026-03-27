@@ -1,24 +1,28 @@
 import React, { useState, useEffect, useMemo, memo, useCallback } from 'react';
-import pathwordleLogo from '../assets/pathwordle_logo.png';
 import { usePathWordle } from '../hooks/usePathWordle';
 import { useStatistics } from '../hooks/useStatistics';
 import Grid from './Grid';
-import GuessHistory from './GuessHistory';
-import GameControls from './GameControls';
 import GameResult from './GameResult';
 import Statistics from './Statistics';
-import AchievementNotification, { useAchievementNotifications } from './AchievementNotification';
-import HintPanel from './HintPanel';
-import Friends from './Friends';
-import Multiplayer from './Multiplayer';
-import ThemeSelector from './ThemeSelector';
+import AchievementNotification from './AchievementNotification';
+import ShareSystem from './ShareSystem';
+import UserEngagementHooks from './UserEngagementHooks';
+import OptimizedHintPanel from './OptimizedHintPanel';
+import PrivacyPolicy from './PrivacyPolicy';
+import TermsOfService from './TermsOfService';
+import About from './About';
+import Contact from './Contact';
+import Footer from './Footer';
 import { pathToWord } from '../utils/gameLogic';
-import ContentQualityPanel from './ContentQualityPanel';
-import { BarChart3, Trophy, Lightbulb, Globe, Users, Swords, Palette, BookOpen } from 'lucide-react';
+import { HowToPlayModal } from './HowToPlayModal';
+import { Modal } from './base/Modal/Modal';
+import { BarChart3, HelpCircle, Sun, Moon, Calendar, Target, Lightbulb } from 'lucide-react';
+
 
 interface PathWordleProps {
   gameMode?: 'daily' | 'practice';
   difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+  onModeChange?: (mode: 'daily' | 'practice') => void;
 }
 
 // Memoized error boundary component
@@ -26,13 +30,13 @@ const ErrorBoundary = memo(({ error, onReset }: { error: string | null; onReset:
   if (!error) return null;
 
   return (
-    <div className="min-h-screen bg-red-50 flex items-center justify-center p-4" role="alert">
-      <div className="bg-white rounded-lg p-6 shadow-lg max-w-md">
-        <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Game</h2>
-        <p className="text-gray-700 mb-6">{error}</p>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4" role="alert">
+      <div className="bg-surface-container rounded-xl p-6 shadow-lg max-w-md">
+        <h2 className="text-2xl font-bold text-error mb-4 font-headline">Error Loading Game</h2>
+        <p className="text-on-surface mb-6">{error}</p>
         <button
           onClick={onReset}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-6 py-2 bg-primary text-on-primary rounded-lg hover:bg-primary-dim transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
         >
           Try Again
         </button>
@@ -43,197 +47,295 @@ const ErrorBoundary = memo(({ error, onReset }: { error: string | null; onReset:
 
 ErrorBoundary.displayName = 'ErrorBoundary';
 
-// Memoized GameHeader component
-const GameHeader = memo(({ gameMode }: { gameMode: 'daily' | 'practice' }) => (
-  <header className="text-center mb-8 flex flex-col items-center">
-    <div className="flex items-center mb-2">
-      <img
-        src={pathwordleLogo}
-        alt="PathWordle Logo"
-        className="w-16 h-16 mr-4"
-        loading="lazy"
-      />
-      <h1 className="text-4xl font-bold text-gray-800">
-        PathWordle {gameMode === 'practice' && <span className="text-lg text-blue-600">(Practice)</span>}
-      </h1>
+// Material Design Top App Bar with Game Mode Toggle
+const TopAppBar = memo(({
+  onShowHowToPlay,
+  onShowStatistics,
+  onShowSettings,
+  gameMode,
+  onModeChange,
+  isDarkMode,
+  onToggleTheme,
+  onShowHints
+}: {
+  onShowHowToPlay: () => void;
+  onShowStatistics: () => void;
+  onShowSettings: () => void;
+  gameMode: 'daily' | 'practice';
+  onModeChange: (mode: 'daily' | 'practice') => void;
+  isDarkMode: boolean;
+  onToggleTheme: () => void;
+  onShowHints: () => void;
+}) => (
+  <header className="bg-background sticky top-0 z-50">
+    <div className="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+      <div className="text-2xl font-black text-primary tracking-tighter italic font-headline uppercase">
+        PathWordle
+      </div>
+      <div className="flex items-center gap-6">
+        {/* Game Mode Toggle */}
+        <div className="relative group">
+          <button
+            onClick={() => onModeChange(gameMode === 'daily' ? 'practice' : 'daily')}
+            className="text-on-surface-variant hover:text-primary hover:bg-primary/10 p-2 rounded-lg transition-all duration-300 cursor-pointer scale-95 active:scale-90 transition-transform"
+            aria-label={`Current mode: ${gameMode}. Click to switch.`}
+          >
+            {gameMode === 'daily' ? <Calendar className="w-6 h-6" /> : <Target className="w-6 h-6" />}
+          </button>
+          {/* Tooltip */}
+          <div className="absolute top-full right-0 mt-2 px-3 py-1.5 bg-surface-container-highest rounded-lg text-xs font-medium text-on-surface whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+            {gameMode === 'daily' ? 'Daily Challenge' : 'Practice Mode'}
+          </div>
+        </div>
+
+        {/* Theme Toggle */}
+        <div className="relative group">
+          <button
+            onClick={onToggleTheme}
+            className="text-on-surface-variant hover:text-secondary hover:bg-secondary/10 p-2 rounded-lg transition-all duration-300 cursor-pointer scale-95 active:scale-90 transition-transform"
+            aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+          >
+            {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+          </button>
+          {/* Tooltip */}
+          <div className="absolute top-full right-0 mt-2 px-3 py-1.5 bg-surface-container-highest rounded-lg text-xs font-medium text-on-surface whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+            {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          </div>
+        </div>
+
+        {/* Hints */}
+        <div className="relative group">
+          <button
+            onClick={onShowHints}
+            className="text-on-surface-variant hover:text-primary hover:bg-primary/10 p-2 rounded-lg transition-all duration-300 cursor-pointer scale-95 active:scale-90 transition-transform"
+            aria-label="Get hints"
+          >
+            <Lightbulb className="w-6 h-6" />
+          </button>
+          {/* Tooltip */}
+          <div className="absolute top-full right-0 mt-2 px-3 py-1.5 bg-surface-container-highest rounded-lg text-xs font-medium text-on-surface whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+            Smart Hints
+          </div>
+        </div>
+
+        {/* How to Play */}
+        <div className="relative group">
+          <button
+            onClick={onShowHowToPlay}
+            className="text-on-surface-variant hover:text-tertiary hover:bg-tertiary/10 p-2 rounded-lg transition-all duration-300 cursor-pointer scale-95 active:scale-90 transition-transform"
+            aria-label="Help"
+          >
+            <HelpCircle className="w-6 h-6" />
+          </button>
+          {/* Tooltip */}
+          <div className="absolute top-full right-0 mt-2 px-3 py-1.5 bg-surface-container-highest rounded-lg text-xs font-medium text-on-surface whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+            How to Play
+          </div>
+        </div>
+
+        {/* Statistics */}
+        <div className="relative group">
+          <button
+            onClick={onShowStatistics}
+            className="text-on-surface-variant hover:text-tertiary hover:bg-tertiary/10 p-2 rounded-lg transition-all duration-300 cursor-pointer scale-95 active:scale-90 transition-transform"
+            aria-label="Statistics"
+          >
+            <BarChart3 className="w-6 h-6" />
+          </button>
+          {/* Tooltip */}
+          <div className="absolute top-full right-0 mt-2 px-3 py-1.5 bg-surface-container-highest rounded-lg text-xs font-medium text-on-surface whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+            Statistics
+          </div>
+        </div>
+      </div>
     </div>
-    <p className="text-gray-600 max-w-2xl mx-auto">
-      Connect adjacent letters to form paths and guess the hidden 5-letter word.
-      Use the Wordle-style feedback to guide your next guess!
-    </p>
+    <div className="bg-surface-container-low h-[1px] w-full"></div>
   </header>
 ));
 
-GameHeader.displayName = 'GameHeader';
+TopAppBar.displayName = 'TopAppBar';
 
-// Memoized HowToPlay component
-const HowToPlay = memo(() => (
-  <div className="mt-12 max-w-4xl mx-auto bg-white rounded-xl p-6 shadow-lg">
-    <h2 className="text-xl font-semibold text-gray-800 mb-4">How to Play</h2>
-    <div className="grid md:grid-cols-2 gap-6 text-gray-600">
-      <div>
-        <h3 className="font-medium text-gray-800 mb-2">Creating Paths</h3>
-        <ul className="space-y-1 text-sm">
-          <li>• Click letters to create a path of exactly 5 letters</li>
-          <li>• Letters must be adjacent (horizontal, vertical, or diagonal)</li>
-          <li>• Each letter can only be used once per path</li>
-          <li>• Click the last letter in your path to remove it</li>
-        </ul>
+// Challenge Progress Indicator
+interface ChallengeProgressProps {
+  attemptsUsed: number;
+  maxAttempts: number;
+}
+
+const ChallengeProgress = memo(({ attemptsUsed, maxAttempts }: ChallengeProgressProps) => (
+  <div className="mb-12 text-center w-full">
+    <div className="inline-flex flex-col items-center">
+      <span className="font-headline font-bold text-xs uppercase tracking-[0.3em] text-on-surface-variant mb-2">
+        Daily Challenge
+      </span>
+      <div className="flex items-center gap-4">
+        <span className="font-headline font-black text-4xl text-primary">{attemptsUsed + 1}/{maxAttempts}</span>
+        <span className="font-headline font-light text-2xl text-outline-variant">guess</span>
       </div>
-      <div>
-        <h3 className="font-medium text-gray-800 mb-2">Feedback Colors</h3>
-        <ul className="space-y-1 text-sm">
-          <li>• <span className="inline-block w-3 h-3 bg-green-500 rounded mr-2" aria-hidden="true"></span>Green: Correct letter in correct position</li>
-          <li>• <span className="inline-block w-3 h-3 bg-yellow-500 rounded mr-2" aria-hidden="true"></span>Yellow: Correct letter in wrong position</li>
-          <li>• <span className="inline-block w-3 h-3 bg-gray-400 rounded mr-2" aria-hidden="true"></span>Gray: Letter not in target word</li>
-        </ul>
+      <div className="text-xs text-on-surface-variant mt-2">
+        6 chances to guess today's word
       </div>
     </div>
   </div>
 ));
 
-HowToPlay.displayName = 'HowToPlay';
 
-// Memoized CurrentPathDisplay component
-const CurrentPathDisplay = memo(({
-  currentWord,
-  onClear,
-  onSubmit,
-  canSubmit,
-  pathLength
-}: {
-  currentWord: string;
-  onClear: () => void;
-  onSubmit: () => void;
-  canSubmit: boolean;
-  pathLength: number;
-}) => {
-  if (currentWord) {
-    return (
-      <div className="bg-white rounded-lg px-4 py-2 shadow-md">
-        <div className="text-sm text-gray-500 mb-1 text-center">Current Path:</div>
-        <div
-          className="text-xl font-bold text-gray-800 tracking-widest text-center mb-3"
-          role="status"
-          aria-live="polite"
-          aria-label={`Current path: ${currentWord.split('').join(' ')}`}
-        >
-          {currentWord}
-        </div>
+ChallengeProgress.displayName = 'ChallengeProgress';
 
-        {/* Mobile-optimized buttons positioned around current path */}
-        <div className="lg:hidden flex items-center justify-between gap-2 mt-2">
-          <button
-            onClick={onClear}
-            disabled={pathLength === 0}
-            className="
-              flex items-center gap-1 px-3 py-1.5 rounded-md text-sm
-              bg-red-500 hover:bg-red-600 disabled:bg-gray-300
-              text-white font-medium transition-colors duration-200
-              disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500
-            "
-            aria-label="Clear current path"
-          >
-            Clear
-          </button>
-
-          <button
-            onClick={onSubmit}
-            disabled={!canSubmit}
-            className="
-              flex items-center gap-1 px-3 py-1.5 rounded-md text-sm
-              bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300
-              text-white font-medium transition-colors duration-200
-              disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500
-            "
-            aria-label="Submit guess"
-          >
-            Submit
-          </button>
-        </div>
-      </div>
-    );
-  }
+// Word Input Slots
+const WordInputSlots = memo(({ currentWord, maxLength }: { currentWord: string; maxLength: number }) => {
+  const slots = Array.from({ length: maxLength }, (_, i) => currentWord[i] || '');
 
   return (
-    <div className="lg:hidden bg-white rounded-lg px-4 py-2 shadow-md">
-      <div className="text-sm text-gray-500 mb-1 text-center">Select letters to create a path</div>
-      <div className="flex items-center justify-between gap-2 mt-2">
-        <button
-          onClick={onClear}
-          disabled={pathLength === 0}
-          className="
-            flex items-center gap-1 px-3 py-1.5 rounded-md text-sm
-            bg-red-500 hover:bg-red-600 disabled:bg-gray-300
-            text-white font-medium transition-colors duration-200
-            disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500
-          "
-          aria-label="Clear current path"
+    <div className="flex gap-3 justify-center">
+      {slots.map((letter, i) => (
+        <div
+          key={i}
+          className={`md-grid-cell word-slot ${
+            letter ? 'word-slot-active' : 'word-slot-inactive'
+          }`}
         >
-          Clear
-        </button>
-
-        <button
-          onClick={onSubmit}
-          disabled={!canSubmit}
-          className="
-            flex items-center gap-1 px-3 py-1.5 rounded-md text-sm
-            bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300
-            text-white font-medium transition-colors duration-200
-            disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500
-          "
-          aria-label="Submit guess"
-        >
-          Submit
-        </button>
-      </div>
+          {letter}
+        </div>
+      ))}
     </div>
   );
 });
 
-CurrentPathDisplay.displayName = 'CurrentPathDisplay';
+WordInputSlots.displayName = 'WordInputSlots';
 
-const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty = 'medium' }) => {
+// Game Action Buttons
+const GameActionButtons = memo(({
+  onClear,
+  onSubmit,
+  canSubmit,
+  hasSelection
+}: {
+  onClear: () => void;
+  onSubmit: () => void;
+  canSubmit: boolean;
+  hasSelection: boolean;
+}) => (
+  <div className="flex gap-4 w-full">
+    <button
+      onClick={onClear}
+      disabled={!hasSelection}
+      className={`md-button md-button-secondary flex-1 py-5 px-6 ${
+        !hasSelection ? 'md-button-disabled' : ''
+      }`}
+    >
+      CLEAR
+    </button>
+    <button
+      onClick={onSubmit}
+      disabled={!canSubmit}
+      className={`md-button md-button-primary flex-[2] py-5 px-8 ${
+        !canSubmit ? 'md-button-disabled' : ''
+      }`}
+    >
+      SUBMIT PATH
+    </button>
+  </div>
+));
+
+GameActionButtons.displayName = 'GameActionButtons';
+
+const PathWordle: React.FC<PathWordleProps> = ({ gameMode: initialGameMode = 'daily', difficulty = 'medium', onModeChange }) => {
+
+  // State for game mode and theme
+  const [gameMode, setGameMode] = useState<'daily' | 'practice'>(initialGameMode);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
   // Core hooks
   const { gameState, selectCell, submitGuess, clearPath, resetGame, canSubmit } = usePathWordle(gameMode);
-  const { recordGame, shareResult, getNextAchievement, clearNewAchievements, statistics } = useStatistics();
-  const { AchievementNotificationComponent } = useAchievementNotifications();
-  const [showContentQuality, setShowContentQuality] = useState(false);
+  const { recordGame, getNextAchievement, clearNewAchievements, statistics } = useStatistics();
 
   // State hooks
   const [error, setError] = useState<string | null>(null);
   const [showStatistics, setShowStatistics] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showHints, setShowHints] = useState(false);
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [showFriends, setShowFriends] = useState(false);
-  const [showMultiplayer, setShowMultiplayer] = useState(false);
-  const [showThemeSelector, setShowThemeSelector] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showContact, setShowContact] = useState(false);
   const [gameStartTime, setGameStartTime] = useState<number>(Date.now());
-  const [currentAchievement, setCurrentAchievement] = useState(null);
+  const [currentAchievement, setCurrentAchievement] = useState<any>(null);
+
+  // Theme toggle handler
+  const handleToggleTheme = useCallback(() => {
+    setIsDarkMode(prev => {
+      const newValue = !prev;
+      // Toggle dark class on HTML element
+      if (newValue) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#0e0e0f';
+        document.documentElement.style.color = '#ffffff';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#ffffff';
+        document.documentElement.style.color = '#111827';
+      }
+      return newValue;
+    });
+  }, []);
+
+  // Initialize theme on mount
+  useEffect(() => {
+    // Check for saved theme preference or default to dark
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
+      setIsDarkMode(false);
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.backgroundColor = '#ffffff';
+      document.documentElement.style.color = '#111827';
+    } else {
+      setIsDarkMode(true);
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.backgroundColor = '#0e0e0f';
+      document.documentElement.style.color = '#ffffff';
+    }
+  }, []);
+
+  // Save theme preference when it changes
+  useEffect(() => {
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
+  // Mode change handler
+  const handleModeChange = useCallback((newMode: 'daily' | 'practice') => {
+    setGameMode(newMode);
+    if (onModeChange) {
+      onModeChange(newMode);
+    }
+    // Reset game when mode changes
+    resetGame();
+    setGameStartTime(Date.now());
+  }, [onModeChange, resetGame]);
 
   // Memoize current word calculation
   const currentWord = useMemo(() => {
     return gameState?.currentPath ? pathToWord(gameState.currentPath) : '';
   }, [gameState?.currentPath]);
 
-  // Memoize callbacks to prevent unnecessary re-renders and add debouncing
+  // Callbacks
   const handleCellClick = useCallback((row: number, col: number) => {
-    // Prevent rapid clicking and add haptic feedback
+    if (!gameState || gameState.gameStatus !== 'playing') return;
     selectCell(row, col);
-
-    // Add visual feedback
-    if (gameState?.grid[row][col]?.isSelected) {
-      // Optional: Add a small animation or haptic feedback
-    }
-  }, [selectCell, gameState]);
+  }, [gameState, selectCell]);
 
   const handleSubmit = useCallback(() => {
-    submitGuess();
-  }, [submitGuess]);
+    if (canSubmit) {
+      submitGuess();
+    }
+  }, [canSubmit, submitGuess]);
 
   const handleClear = useCallback(() => {
-    clearPath();
-  }, [clearPath, gameState?.currentPath.length > 0]);
+    if (gameState?.currentPath && gameState.currentPath.length > 0) {
+      clearPath();
+    }
+  }, [clearPath, gameState?.currentPath]);
 
   const handleReset = useCallback(() => {
     resetGame();
@@ -271,13 +373,50 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
     const nextAchievement = getNextAchievement();
     if (nextAchievement && nextAchievement !== currentAchievement) {
       setCurrentAchievement(nextAchievement);
-      // Show achievement notification
       setTimeout(() => {
         clearNewAchievements();
         setCurrentAchievement(null);
       }, 5000);
     }
   }, [statistics, getNextAchievement, clearNewAchievements, currentAchievement]);
+
+  // Inject Giscus script dynamically with theme support
+  useEffect(() => {
+    // Only load Giscus if repo is configured
+    const repoId = "ENTER_YOUR_REPO_ID_HERE"; // Replace with actual repo ID
+    if (repoId === "ENTER_YOUR_REPO_ID_HERE") {
+      console.log('Giscus not configured. Add your repository details to enable comments.');
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = "https://giscus.app/client.js";
+    script.setAttribute("data-repo", "your-username/your-repo"); // Replace with actual repo
+    script.setAttribute("data-repo-id", repoId);
+    script.setAttribute("data-category", "General");
+    script.setAttribute("data-category-id", "ENTER_CATEGORY_ID_HERE"); // Replace with actual category ID
+    script.setAttribute("data-mapping", "pathname");
+    script.setAttribute("data-strict", "0");
+    script.setAttribute("data-reactions-enabled", "1");
+    script.setAttribute("data-emit-metadata", "0");
+    script.setAttribute("data-input-position", "top");
+    script.setAttribute("data-theme", isDarkMode ? "dark" : "light");
+    script.setAttribute("data-lang", "en");
+    script.setAttribute("data-loading", "lazy");
+    script.crossOrigin = "anonymous";
+    script.async = true;
+
+    const commentsContainer = document.getElementById('giscus-container');
+    if (commentsContainer) {
+      commentsContainer.appendChild(script);
+    }
+
+    return () => {
+      if (commentsContainer && commentsContainer.contains(script)) {
+        commentsContainer.removeChild(script);
+      }
+    };
+  }, [isDarkMode]);
 
   // Validate game state
   useEffect(() => {
@@ -291,12 +430,8 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
   // Global keyboard shortcuts
   useEffect(() => {
     const handleGlobalKeyDown = (event: KeyboardEvent) => {
-      // Only handle shortcuts when not focused on input elements
-      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-        return;
-      }
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
 
-      // Prevent default for our shortcuts
       switch (event.key.toLowerCase()) {
         case 'enter':
           if (canSubmit && currentWord) {
@@ -317,12 +452,6 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
             handleReset();
           }
           break;
-        case 'h':
-          // Help - focus on first available cell
-          event.preventDefault();
-          const firstAvailableCell = document.querySelector('[aria-disabled="false"]') as HTMLButtonElement;
-          firstAvailableCell?.focus();
-          break;
       }
     };
 
@@ -330,235 +459,148 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
   }, [canSubmit, currentWord, handleSubmit, handleClear, handleReset]);
 
-  // Show error state if there's an error
-  if (error) {
-    return <ErrorBoundary error={error} onReset={handleReset} />;
-  }
+  // Render logic
+  if (error) return <ErrorBoundary error={error} onReset={handleReset} />;
 
-  // Show loading state if game state is not ready
   if (!gameState || !gameState.grid || gameState.grid.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading game...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center animate-pulse">
+          <div className="w-12 h-12 bg-primary rounded-full mx-auto mb-4"></div>
+          <p className="text-on-surface-variant font-medium">Loading PathWordle...</p>
         </div>
       </div>
     );
   }
 
-  // Memoize main game content to prevent unnecessary re-renders
-  const mainContent = useMemo(() => {
-    // Add content quality improvement
-    const contentQualityButton = (
-      <button
-        onClick={() => setShowContentQuality(!showContentQuality)}
-        className="fixed bottom-4 left-4 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors z-40 focus:outline-none focus:ring-2 focus:ring-white"
-        aria-label="Content quality and learning tips"
-        title="Improve your gameplay with advanced strategies and vocabulary"
-      >
-        <BookOpen className="w-4 h-4" />
-      </button>
-    );
+  return (
+    <div id="main-content" className="min-h-screen bg-background text-on-surface font-body flex flex-col">
+      <TopAppBar
+        onShowHowToPlay={() => setShowHowToPlay(true)}
+        onShowStatistics={() => setShowStatistics(true)}
+        onShowSettings={() => {}}
+        gameMode={gameMode}
+        onModeChange={handleModeChange}
+        isDarkMode={isDarkMode}
+        onToggleTheme={handleToggleTheme}
+        onShowHints={() => setShowHints(true)}
+      />
 
-    return (
-      <div id="main-content" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8" tabIndex={-1}>
-        <div className="max-w-6xl mx-auto px-4">
-          {/* Header with Stats and Hints Buttons */}
-          <div className="flex items-center justify-between mb-8">
-            <GameHeader gameMode={gameMode} />
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                onClick={() => setShowHints(!showHints)}
-                className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                aria-label={showHints ? 'Hide hints and word tips' : 'Show hints and word tips'}
-                aria-expanded={showHints}
-              >
-                <Lightbulb className="w-5 h-5 text-yellow-500" />
-                <span className="hidden sm:inline font-medium">Word Tips</span>
-              </button>
-            <button
-              onClick={() => setShowStatistics(!showStatistics)}
-              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label={showStatistics ? 'Hide your game statistics and achievements' : 'Show your game statistics and achievements'}
-              aria-expanded={showStatistics}
-            >
-              <BarChart3 className="w-5 h-5" />
-              <span className="hidden sm:inline font-medium">Statistics</span>
-              <Trophy className="w-4 h-4 text-yellow-500" />
-            </button>
-            {gameMode === 'daily' && (
-              <button
-                onClick={() => setShowLeaderboard(!showLeaderboard)}
-                className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                aria-label={showLeaderboard ? 'Hide Leaderboard' : 'Show Leaderboard'}
-                aria-expanded={showLeaderboard}
-              >
-                <Globe className="w-5 h-5" />
-                <span className="hidden sm:inline font-medium">Leaderboard</span>
-              </button>
-            )}
-            <button
-              onClick={() => setShowFriends(!showFriends)}
-              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              aria-label={showFriends ? 'Hide Friends' : 'Show Friends'}
-              aria-expanded={showFriends}
-            >
-              <Users className="w-5 h-5" />
-              <span className="hidden sm:inline font-medium">Friends</span>
-            </button>
-            <button
-              onClick={() => setShowMultiplayer(!showMultiplayer)}
-              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-              aria-label={showMultiplayer ? 'Hide Multiplayer' : 'Show Multiplayer'}
-              aria-expanded={showMultiplayer}
-            >
-              <Swords className="w-5 h-5" />
-              <span className="hidden sm:inline font-medium">Battle</span>
-            </button>
-            <button
-              onClick={() => setShowThemeSelector(!showThemeSelector)}
-              className="bg-white rounded-lg px-4 py-2 shadow-md hover:shadow-lg transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              aria-label={showThemeSelector ? 'Hide Themes' : 'Show Themes'}
-              aria-expanded={showThemeSelector}
-            >
-              <Palette className="w-5 h-5" />
-              <span className="hidden sm:inline font-medium">Themes</span>
-            </button>
-          </div>
+      <main className="flex-grow flex flex-col items-center justify-center p-4 md:p-8 max-w-5xl mx-auto w-full">
+        <ChallengeProgress
+          attemptsUsed={6 - gameState.attemptsLeft}
+          maxAttempts={6}
+        />
+
+        {/* Main Game Board Container */}
+        <div className="relative w-full max-w-lg aspect-square mb-12">
+          <Grid grid={gameState.grid} onCellClick={handleCellClick} />
         </div>
 
-        {/* Hints Panel */}
-        {showHints && gameState && (
-          <div className="mb-8">
-            <HintPanel
-              grid={gameState.grid}
-              currentPath={gameState.currentPath}
-              difficulty={difficulty}
+        {/* Word Input Area */}
+        <div className="w-full max-w-md flex flex-col items-center gap-8">
+          <WordInputSlots currentWord={currentWord} maxLength={5} />
+          <GameActionButtons
+            onClear={handleClear}
+            onSubmit={handleSubmit}
+            canSubmit={canSubmit}
+            hasSelection={gameState.currentPath.length > 0}
+          />
+        </div>
+      </main>
+
+      {/* Modals for Panels */}
+      <Modal isOpen={showStatistics} onClose={() => setShowStatistics(false)} title="Statistics" size="lg">
+        <Statistics showDetailed={true} />
+      </Modal>
+
+      {(gameState.gameStatus === 'won' || gameState.gameStatus === 'lost') && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-surface-container rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <GameResult
+              gameStatus={gameState.gameStatus}
               targetWord={gameState.targetWord}
-              isVisible={showHints}
-              onClose={() => setShowHints(false)}
-              compact={true}
-            />
-          </div>
-        )}
-
-        {/* Statistics Panel */}
-        {showStatistics && (
-          <div className="mb-8">
-            <Statistics showDetailed={false} />
-          </div>
-        )}
-
-        {/* Leaderboard Panel */}
-        {showLeaderboard && (
-          <div className="mb-8">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Leaderboard temporarily unavailable</h3>
-              <p className="text-gray-600">We are currently maintaining the leaderboard system. Please try again later.</p>
-            </div>
-          </div>
-        )}
-
-        {/* Friends Panel */}
-        {showFriends && (
-          <div className="mb-8">
-            <Friends compact={false} showActions={true} />
-          </div>
-        )}
-
-        {/* Multiplayer Panel */}
-        {showMultiplayer && (
-          <div className="mb-8">
-            <Multiplayer />
-          </div>
-        )}
-
-        {/* Theme Selector Panel */}
-        {showThemeSelector && (
-          <div className="mb-8">
-            <ThemeSelector />
-          </div>
-        )}
-
-        <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start justify-center">
-          {/* Game Grid */}
-          <div className="flex flex-col items-center gap-6" role="main" aria-label="Game board">
-            <Grid grid={gameState.grid} onCellClick={handleCellClick} />
-
-            <CurrentPathDisplay
-              currentWord={currentWord}
-              onClear={handleClear}
-              onSubmit={handleSubmit}
-              canSubmit={canSubmit}
-              pathLength={gameState.currentPath.length}
+              attemptsUsed={6 - gameState.attemptsLeft}
+              onReset={handleReset}
+              gameMode={gameState.gameMode}
+              difficulty={difficulty}
+              timeTaken={Math.round((Date.now() - gameStartTime) / 1000)}
+              score={gameState.gameStatus === 'won' ? Math.max(1000 - ((6 - gameState.attemptsLeft - 1) * 200) - Math.round((Date.now() - gameStartTime) / 1000), 100) : 0}
+              hintsUsed={0}
+              maxStreak={statistics.maxStreak}
             />
 
-            {/* Desktop Game Controls (hidden on mobile) */}
-            <div className="hidden lg:block">
-              <GameControls
-                canSubmit={canSubmit}
-                currentPathLength={gameState.currentPath.length}
-                onSubmit={handleSubmit}
-                onClear={handleClear}
-                attemptsLeft={gameState.attemptsLeft}
+            {/* Share System */}
+            <div className="mt-6">
+              <ShareSystem
+                gameResult={{
+                  won: gameState.gameStatus === 'won',
+                  attemptsUsed: 6 - gameState.attemptsLeft,
+                  word: gameState.targetWord,
+                  timeTaken: Math.round((Date.now() - gameStartTime) / 1000)
+                }}
+                onShare={(platform) => console.log(`Shared to ${platform}`)}
               />
             </div>
           </div>
+        </div>
+      )}
 
-          {/* Guess History */}
-          <div className="flex justify-center w-full lg:w-auto" role="complementary" aria-label="Guess history">
-            <GuessHistory guesses={gameState.guesses} />
+      {/* User Engagement Hooks */}
+      <UserEngagementHooks
+        gameStats={{
+          gamesPlayed: statistics?.gamesPlayed || 0,
+          streak: statistics?.currentStreak || 0,
+          maxStreak: statistics?.maxStreak || 0,
+          lastPlayed: new Date().toISOString()
+        }}
+        lastGame={
+          gameState.gameStatus === 'won' || gameState.gameStatus === 'lost'
+            ? {
+                won: gameState.gameStatus === 'won',
+                attemptsUsed: 6 - gameState.attemptsLeft,
+                timeTaken: Math.round((Date.now() - gameStartTime) / 1000)
+              }
+            : undefined
+        }
+        onAction={(hookId, action) => console.log(`Hook ${hookId} action: ${action}`)}
+      />
+
+      <div id="comments-container" className="max-w-5xl mx-auto w-full px-8 py-8 mt-auto border-t border-surface-container-high">
+        <h2 className="text-2xl font-bold text-on-surface mb-8 text-center uppercase tracking-wider font-headline">
+          Community Discussion
+        </h2>
+        <div className="bg-surface-container rounded-xl p-6 sm:p-10 shadow-sm">
+          <div id="giscus-container" className="giscus mx-auto">
+            {/* Placeholder text when Giscus is not configured */}
+            <div className="text-center text-on-surface-variant py-8">
+              <p className="mb-4">Comments powered by Giscus</p>
+              <p className="text-sm text-outline-variant">
+                To enable comments, configure your GitHub repository in the code.
+              </p>
+              <a
+                href="https://giscus.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-4 px-4 py-2 bg-primary text-on-primary rounded-lg hover:bg-primary-dim transition-colors text-sm font-medium"
+              >
+                Learn More
+              </a>
+            </div>
           </div>
         </div>
-
-        <HowToPlay />
-
-        {/* Game Result Modal */}
-        {(gameState.gameStatus === 'won' || gameState.gameStatus === 'lost') && (
-          <GameResult
-            gameStatus={gameState.gameStatus}
-            targetWord={gameState.targetWord}
-            attemptsUsed={6 - gameState.attemptsLeft}
-            onReset={handleReset}
-            gameMode={gameState.gameMode}
-            difficulty={difficulty}
-            timeTaken={Math.round((Date.now() - gameStartTime) / 1000)}
-            score={gameState.gameStatus === 'won' ? Math.max(1000 - ((6 - gameState.attemptsLeft - 1) * 200) - Math.round((Date.now() - gameStartTime) / 1000), 100) : 0}
-            hintsUsed={0} // Can be tracked in the future
-            maxStreak={statistics.maxStreak} // Can be retrieved from statistics
-          />
-        )}
       </div>
-    </div>
-  );
-}, [
-  gameMode,
-  gameState?.grid,
-  handleCellClick,
-  currentWord,
-  handleClear,
-  handleSubmit,
-  canSubmit,
-  gameState?.currentPath.length,
-  gameState?.attemptsLeft,
-  gameState?.guesses,
-  gameState?.gameStatus,
-  gameState?.targetWord,
-  handleReset,
-  showStatistics,
-  showThemeSelector,
-  showFriends,
-  showMultiplayer,
-  showLeaderboard,
-  showHints,
-  showContentQuality
-]);
 
-  return (
-    <>
-      {mainContent}
-      {/* Achievement Notification */}
+      {/* Footer */}
+      <Footer
+        onShowPrivacy={() => setShowPrivacy(true)}
+        onShowTerms={() => setShowTerms(true)}
+        onShowAbout={() => setShowAbout(true)}
+        onShowContact={() => setShowContact(true)}
+      />
+
+      <HowToPlayModal isOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} />
+
       <AchievementNotification
         achievement={currentAchievement}
         onClose={() => {
@@ -567,19 +609,25 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode = 'daily', difficulty 
         }}
       />
 
-      {/* Fullscreen Hint Panel */}
-      {showHints && gameState && (
-        <HintPanel
-          grid={gameState.grid}
-          currentPath={gameState.currentPath}
-          difficulty={difficulty}
-          targetWord={gameState.targetWord}
-          isVisible={showHints}
-          onClose={() => setShowHints(false)}
-          compact={false}
-        />
-      )}
-    </>
+      {/* Optimized Hint Panel */}
+      <OptimizedHintPanel
+        isVisible={showHints}
+        onClose={() => setShowHints(false)}
+        onUseHint={(hintId) => {
+          console.log(`Using hint: ${hintId}`);
+          return true;
+        }}
+        targetWord={gameState.targetWord}
+        currentPath={currentWord}
+        attemptsLeft={gameState.attemptsLeft}
+      />
+
+      {/* AdSense Required Pages */}
+      <PrivacyPolicy isOpen={showPrivacy} onClose={() => setShowPrivacy(false)} />
+      <TermsOfService isOpen={showTerms} onClose={() => setShowTerms(false)} />
+      <About isOpen={showAbout} onClose={() => setShowAbout(false)} />
+      <Contact isOpen={showContact} onClose={() => setShowContact(false)} />
+    </div>
   );
 };
 

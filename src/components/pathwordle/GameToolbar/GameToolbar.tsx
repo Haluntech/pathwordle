@@ -8,13 +8,11 @@ interface GameToolbarProps {
   showStatistics: boolean;
   showLeaderboard: boolean;
   showFriends: boolean;
-  showMultiplayer: boolean;
   showThemeSelector: boolean;
   onToggleHints: () => void;
   onToggleStatistics: () => void;
   onToggleLeaderboard: () => void;
   onToggleFriends: () => void;
-  onToggleMultiplayer: () => void;
   onToggleThemeSelector: () => void;
   onToggleContentQuality: () => void;
   showContentQuality: boolean;
@@ -31,13 +29,11 @@ export const GameToolbar = memo(({
   showStatistics,
   showLeaderboard,
   showFriends,
-  showMultiplayer,
   showThemeSelector,
   onToggleHints,
   onToggleStatistics,
   onToggleLeaderboard,
   onToggleFriends,
-  onToggleMultiplayer,
   onToggleThemeSelector,
   onToggleContentQuality,
   showContentQuality
@@ -103,17 +99,6 @@ export const GameToolbar = memo(({
           icon={<Users className="w-5 h-5" />}
         >
           <span className="hidden sm:inline">Friends</span>
-        </Button>
-
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={onToggleMultiplayer}
-          aria-label={showMultiplayer ? 'Hide Multiplayer' : 'Show Multiplayer'}
-          aria-expanded={showMultiplayer}
-          icon={<Swords className="w-5 h-5" />}
-        >
-          <span className="hidden sm:inline">Battle</span>
         </Button>
 
         <Button

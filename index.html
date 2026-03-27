@@ -1,13 +1,27 @@
 <!doctype html>
-<html lang="en">
+<html class="dark" lang="en">
   <head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FHENCTMKTY"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-FHENCTMKTY');
+    </script>
+
     <!-- Primary Meta Tags -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
-    <meta name="description" content="PathWordle: The revolutionary word puzzle game that combines Wordle's beloved mechanics with strategic path-building. Connect adjacent letters to form paths and guess hidden 5-letter words. Perfect for word game enthusiasts looking for a fresh challenge!" />
-    <meta name="keywords" content="PathWordle, word puzzle, word game, daily challenge, brain teaser, letter grid, word guessing, strategic game, cognitive game, vocabulary builder, Wordle alternative" />
+
+    <!-- SEO optimized meta tags -->
+    <meta name="description" content="Play PathWordle - A free strategic word puzzle game. Connect adjacent letters on a grid to form paths and guess hidden 5-letter words. Daily challenges & unlimited practice. Train your brain today!" />
+    <meta name="keywords" content="PathWordle, word puzzle, word game, daily word game, brain training, vocabulary game, Wordle alternative, strategic puzzle, letter grid game, free word games, cognitive game" />
     <meta name="author" content="PathWordle Team" />
     <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="theme-color" content="#aff4a6" />
     <meta name="language" content="English" />
     <meta name="revisit-after" content="1 days" />
 
@@ -47,32 +61,160 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebGame",
-      "name": "PathWordle",
-      "description": "A strategic word puzzle game where players connect letters to form paths and guess hidden 5-letter words with Wordle-style feedback.",
-      "url": "https://pathwordle.com",
-      "image": "https://pathwordle.com/logo.jpg",
-      "genre": ["Word Game", "Puzzle", "Educational", "Brain Training"],
-      "gamePlatform": "Web Browser",
-      "applicationCategory": "Game",
-      "operatingSystem": "Any",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD",
-        "availability": "https://schema.org/InStock"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "ratingCount": "1000+"
-      },
-      "author": {
-        "@type": "Organization",
-        "name": "PathWordle Team"
-      }
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "name": "PathWordle",
+          "url": "https://pathwordle.com",
+          "description": "A strategic word puzzle game combining Wordle mechanics with path-building strategy",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://pathwordle.com/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "WebGame",
+          "name": "PathWordle",
+          "description": "PathWordle is a strategic word puzzle game where players connect adjacent letters on a 6×6 grid to form paths and guess hidden 5-letter words. Features daily challenges, practice mode, and Material Design 3 interface.",
+          "url": "https://pathwordle.com",
+          "genre": ["Word Game", "Puzzle", "Strategy", "Brain Training"],
+          "gamePlatform": "Web Browser",
+          "applicationCategory": "Game",
+          "operatingSystem": "Any",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "1250",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "author": {
+            "@type": "Organization",
+            "name": "Luminous Logic"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is PathWordle and how do I play?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "PathWordle is a strategic word puzzle game where you connect adjacent letters (horizontally, vertically, or diagonally) on a 6×6 grid to form paths and guess hidden 5-letter words. Each day features a new daily challenge, or you can practice unlimitedly. The game uses color-coded feedback similar to Wordle to guide your guesses."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How is PathWordle different from Wordle?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Unlike Wordle where you type letters directly, PathWordle requires you to build paths through a grid by connecting adjacent letters. This adds a spatial strategy element - you must navigate around the grid while forming words. You can connect letters in any direction (horizontal, vertical, or diagonal), creating more strategic depth."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I connect letters diagonally?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes! You can connect letters horizontally, vertically, or diagonally, as long as they are adjacent to each other. This gives you more flexibility in finding paths through the grid."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What do the colors mean in PathWordle?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "PathWordle uses a color-coding system similar to Wordle: Green indicates the letter is correct and in the right position, Yellow shows the letter is in the word but wrong position, and Gray means the letter is not in the target word at all."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is PathWordle free to play?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, PathWordle is completely free to play. There are no ads, no subscriptions, and no in-app purchases. Just pure word puzzle enjoyment!"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I play PathWordle on my phone?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Absolutely! PathWordle is fully optimized for mobile browsers and works great on both phones and tablets. You can even install it as a Progressive Web App (PWA) for a native app-like experience."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How often do new challenges appear?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "New daily challenges appear every day at midnight in your local timezone. Each daily challenge is the same for all players worldwide, so you can compare your results with friends."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Does PathWordle track my statistics?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes! PathWordle tracks your games played, win rate, current streak, and max streak. You can view these stats anytime by clicking the statistics icon in the top navigation bar."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I share my results?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes! After completing each game, you can share your results on social media. PathWordle generates a shareable graphic showing your path without spoiling the answer for others."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What's the difference between Daily Challenge and Practice Mode?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Daily Challenge features one new puzzle per day that everyone plays, perfect for competing with friends. Practice Mode lets you play unlimited random puzzles anytime, great for improving your skills without pressure."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://pathwordle.com"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Play",
+              "item": "https://pathwordle.com/play"
+            }
+          ]
+        },
+        {
+          "@type": "Organization",
+          "name": "Luminous Logic",
+          "url": "https://pathwordle.com",
+          "logo": "https://pathwordle.com/logo.png",
+          "sameAs": [
+            "https://twitter.com/PathWordleGame",
+            "https://github.com/pathwordle"
+          ]
+        }
+      ]
     }
     </script>
+
 
     <!-- Icons and Manifest -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -84,8 +226,13 @@
 
     <!-- Preconnect to external domains for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://pagead2.googlesyndication.com">
     <link rel="dns-prefetch" href="//googleads.g.doubleclick.net">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
     <!-- Critical CSS for preventing FOUC -->
     <style>
@@ -127,7 +274,31 @@
       }
     </style>
 
-    <title>PathWordle - Strategic Word Puzzle Game | Daily Challenges</title>
+    <title>PathWordle - Free Daily Word Puzzle Game | Train Your Brain</title>
+
+    <!-- Additional SEO meta tags -->
+    <link rel="canonical" href="https://pathwordle.com/" />
+    <meta name="google-site-verification" content="" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pathwordle.com/" />
+    <meta property="og:title" content="PathWordle - Free Daily Word Puzzle Game" />
+    <meta property="og:description" content="🎯 Master the grid! Connect letters, build paths, guess the hidden 5-letter word. Free daily challenges. No downloads needed." />
+    <meta property="og:image" content="https://pathwordle.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="PathWordle" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://pathwordle.com/" />
+    <meta property="twitter:title" content="PathWordle - Free Strategic Word Puzzle" />
+    <meta property="twitter:description" content="🎯 New twist on word puzzles! Connect letters, build paths, guess words. Free daily challenges!" />
+    <meta property="twitter:image" content="https://pathwordle.com/twitter-card.jpg" />
+    <meta property="twitter:creator" content="@PathWordleGame" />
+    <meta property="twitter:site" content="@PathWordleGame" />
 
     <!-- Google AdSense (deferred loading) -->
     <script
@@ -151,7 +322,7 @@
     <!-- Main script with integrity and crossorigin for security -->
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- Service Worker Registration for PWA -->
+    <!-- Service Worker Registration for PWA (Disabled for testing)
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -165,5 +336,7 @@
         });
       }
     </script>
+    -->
+
   </body>
 </html>

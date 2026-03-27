@@ -41,27 +41,27 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
         onClick={handleBackdropClick}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-xl">
+        <div className="sticky top-0 bg-white border-b border-gray-100 p-6 rounded-t-xl">
           <div className="flex items-center justify-between">
             <div>
               <h2 id="difficulty-dialog-title" className="text-2xl font-bold text-gray-800">
-                选择难度
+                Difficulty Settings
               </h2>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-500 mt-1">
                 {gameMode === 'daily'
-                  ? '选择今日挑战的难度'
+                  ? 'Choose your difficulty for the daily challenge'
                   : gameMode === 'timed'
-                  ? '选择限时挑战的难度'
-                  : '选择练习模式的难度'
+                  ? 'Choose your difficulty for the time challenge'
+                  : 'Adjust the game difficulty settings'
                 }
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="关闭难度选择"
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none"
+              aria-label="Close"
             >
-              <X className="w-6 h-6 text-gray-500" />
+              <X className="w-6 h-6 text-gray-400" />
             </button>
           </div>
         </div>
@@ -77,17 +77,17 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 p-6 rounded-b-xl bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              <p>💡 完成游戏可以解锁更高级别的难度</p>
-              <p>🏆 更高难度 = 更高分数和成就奖励</p>
+        <div className="border-t border-gray-100 p-6 rounded-b-xl bg-gray-50/50">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-gray-500 space-y-1">
+              <p>💡 Complete games to unlock higher difficulty levels</p>
+              <p>🏆 Higher difficulty grants more points and achievements</p>
             </div>
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="w-full sm:w-auto px-8 py-2.5 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-900 transition-all shadow-md active:scale-95"
             >
-              取消
+              Close
             </button>
           </div>
         </div>

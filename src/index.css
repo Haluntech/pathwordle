@@ -154,41 +154,49 @@
     box-shadow: 0 0 0 2px var(--color-primary-light);
   }
 
-  /* Game grid specific improvements */
   .grid-cell {
-    @apply w-12 h-12 rounded-lg border-2 font-bold text-lg transition-all duration-200;
-    color: var(--text-primary);
-    border-color: var(--border-medium);
+    @apply w-12 h-12 sm:w-16 sm:h-16 rounded-2xl border-2 font-black text-2xl sm:text-3xl transition-all duration-300 shadow-lg flex items-center justify-center select-none transform-gpu;
+    color: white;
+    border-color: #334155; /* slate-700 */
+    background-color: #1e293b; /* slate-800 */
   }
 
   .grid-cell:focus-visible {
-    box-shadow: 0 0 0 2px var(--color-primary), 0 0 0 4px var(--color-primary-light);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.4);
     z-index: 10;
   }
 
+  .grid-cell:hover:not(.unavailable) {
+    @apply border-indigo-400 -translate-y-1 shadow-indigo-500/20;
+    background-color: #334155;
+  }
+
   .grid-cell.selected {
-    background-color: var(--color-primary);
-    color: var(--text-inverse);
-    border-color: var(--color-primary-hover);
+    @apply bg-indigo-600 border-white text-white scale-110 z-10 shadow-xl shadow-indigo-500/40;
+    animation: cell-pop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
   .grid-cell.in-path {
-    background-color: var(--color-primary-light);
-    color: var(--color-primary);
-    border-color: var(--color-primary);
+    @apply bg-indigo-900 border-indigo-400 text-indigo-100 shadow-inner;
   }
 
   .grid-cell.available {
-    background-color: var(--color-secondary-light);
-    color: var(--color-secondary);
-    border-color: var(--color-secondary);
+    @apply border-slate-600 text-white;
+    background-color: #1e293b;
   }
 
   .grid-cell.unavailable {
-    background-color: var(--bg-secondary);
-    color: var(--text-muted);
-    border-color: var(--border-light);
+    @apply border-slate-800 text-slate-600 grayscale opacity-40;
+    background-color: #0f172a;
   }
+
+
+  @keyframes cell-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1.1); }
+  }
+
 
   /* Status colors with proper contrast */
   .status-correct {
@@ -262,4 +270,204 @@
     background: white !important;
     color: black !important;
   }
+}
+
+/* Tutorial Animations */
+@keyframes shake {
+
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake 0.2s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Material Design 3 Styles */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.path-glow {
+  box-shadow: 0 0 15px rgba(249, 226, 129, 0.3);
+}
+
+.active-path-glow {
+  filter: drop-shadow(0 0 10px rgba(249, 226, 129, 0.5));
+}
+
+/* Material Design 3 Dark Theme Grid Cell Styles */
+.md-grid-cell {
+  border-radius: 0.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  transition: all 0.2s;
+  background-color: #1f1f21;
+  color: #adaaab;
+}
+
+.md-grid-cell.selected {
+  background-color: #f9e281;
+  color: #605100;
+  box-shadow: 0 10px 15px -3px rgba(249, 226, 129, 0.2);
+  z-index: 10;
+  transform: scale(1.1);
+}
+
+.md-grid-cell.in-path {
+  background-color: #aff4a6;
+  color: #1f5e21;
+}
+
+.md-grid-cell.available-neighbor {
+  border: 1px solid rgba(249, 226, 129, 0.3);
+  color: #f9e281;
+  box-shadow: 0 0 15px rgba(249, 226, 129, 0.3);
+}
+
+.md-grid-cell.word-slot {
+  width: 3.5rem;
+  height: 4rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  font-size: 1.875rem;
+  border-bottom-width: 4px;
+  border-bottom-style: solid;
+}
+
+.md-grid-cell.word-slot-active {
+  background-color: rgba(175, 244, 166, 0.2);
+  border-bottom-color: #aff4a6;
+  color: #aff4a6;
+}
+
+.md-grid-cell.word-slot-inactive {
+  background-color: #1f1f21;
+  border-bottom-color: #484849;
+  color: #adaaab;
+}
+
+/* Material Design Button Styles */
+.md-button {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  font-size: 1.125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+}
+
+.md-button:active {
+  transform: scale(0.95);
+}
+
+.md-button-primary {
+  background-color: #aff4a6;
+  color: #1f5e21;
+}
+
+.md-button-secondary {
+  border: 2px solid #767576;
+  color: #adaaab;
+}
+
+.md-button-secondary:hover {
+  background-color: #1f1f21;
+}
+
+.md-button-disabled {
+  background-color: #262627;
+  color: #6d6d6f;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Light Theme Styles */
+html:not(.dark) {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+}
+
+html:not(.dark) .md-grid-cell {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+
+html:not(.dark) .md-grid-cell.selected {
+  background-color: #fbbf24;
+  color: #78350f;
+  box-shadow: 0 10px 15px -3px rgba(251, 191, 36, 0.2);
+}
+
+html:not(.dark) .md-grid-cell.in-path {
+  background-color: #86efac;
+  color: #065f46;
+}
+
+html:not(.dark) .md-grid-cell.available-neighbor {
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  color: #f59e0b;
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+}
+
+html:not(.dark) .md-grid-cell.word-slot-active {
+  background-color: rgba(134, 239, 172, 0.3);
+  border-bottom-color: #22c55e;
+  color: #16a34a;
+}
+
+html:not(.dark) .md-grid-cell.word-slot-inactive {
+  background-color: #f3f4f6;
+  border-bottom-color: #d1d5db;
+  color: #9ca3af;
+}
+
+html:not(.dark) .md-button-primary {
+  background-color: #22c55e;
+  color: #ffffff;
+}
+
+html:not(.dark) .md-button-secondary {
+  border: 2px solid #d1d5db;
+  color: #6b7280;
+}
+
+html:not(.dark) .md-button-secondary:hover {
+  background-color: #f3f4f6;
+}
+
+html:not(.dark) .md-button-disabled {
+  background-color: #e5e7eb;
+  color: #9ca3af;
 }

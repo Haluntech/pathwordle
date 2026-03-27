@@ -27,18 +27,18 @@ const GameControls: React.FC<GameControlsProps> = ({
         </div>
       </div>
       
-      <div className="flex gap-3">
+      <div className="flex gap-4 w-full max-w-xs">
         <button
           onClick={onClear}
           disabled={currentPathLength === 0}
           className="
-            flex items-center gap-2 px-4 py-2 rounded-lg
-            bg-red-500 hover:bg-red-600 disabled:bg-gray-300
-            text-white font-medium transition-colors duration-200
-            disabled:cursor-not-allowed
+            flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl
+            bg-red-50 hover:bg-red-100 text-red-600 disabled:bg-gray-100 disabled:text-gray-400
+            font-bold transition-colors duration-200
+            disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500
           "
         >
-          <Trash2 size={16} />
+          <Trash2 size={18} />
           Clear
         </button>
         
@@ -46,13 +46,14 @@ const GameControls: React.FC<GameControlsProps> = ({
           onClick={onSubmit}
           disabled={!canSubmit}
           className="
-            flex items-center gap-2 px-6 py-2 rounded-lg
-            bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300
-            text-white font-medium transition-colors duration-200
-            disabled:cursor-not-allowed
+            flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl
+            bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 
+            disabled:from-gray-300 disabled:to-gray-300 disabled:shadow-none
+            text-white font-bold shadow-md shadow-blue-500/30 transition-all duration-200
+            disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500
           "
         >
-          <Send size={16} />
+          <Send size={18} />
           Submit
         </button>
       </div>

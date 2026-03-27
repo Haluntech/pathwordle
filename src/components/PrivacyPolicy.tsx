@@ -1,173 +1,180 @@
 import React, { useState } from 'react';
-import { Shield, FileText, CheckCircle, ArrowRight, X, AlertTriangle } from 'lucide-react';
+import { X, Eye, Shield, Cookie, Database, Trash2 } from 'lucide-react';
 
 interface PrivacyPolicyProps {
-  isVisible: boolean;
+  isOpen: boolean;
   onClose: () => void;
 }
 
-const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ isVisible, onClose }) => {
-  if (!isVisible) return null;
+const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ isOpen, onClose }) => {
+  const [activeSection, setActiveSection] = useState<string>('overview');
+
+  const sections = [
+    { id: 'overview', title: 'Overview', icon: Eye },
+    { id: 'data-collection', title: 'Data Collection', icon: Database },
+    { id: 'data-usage', title: 'Data Usage', icon: Shield },
+    { id: 'cookies', title: 'Cookies & Ads', icon: Cookie },
+    { id: 'user-rights', title: 'Your Rights', icon: Trash2 },
+  ];
+
+  const content = {
+    overview: {
+      title: 'Privacy Policy Overview',
+      lastUpdated: 'March 27, 2026',
+      content: (
+        <div className="space-y-4">
+          <p className="text-on-surface">
+            At PathWordle, we take your privacy seriously. This policy explains how we collect, use, and protect your personal information.
+          </p>
+          <div className="bg-surface-container-high p-4 rounded-lg border-l-4 border-primary">
+            <p className="text-sm font-medium text-primary">
+              <strong>Our Commitment:</strong> We collect minimal data necessary to provide the best gaming experience.
+            </p>
+          </div>
+          <h3 className="text-lg font-bold text-on-surface mt-6">Key Points</h3>
+          <ul className="list-disc list-inside space-y-2 text-on-surface-variant">
+            <li>We use local storage to save your game progress (no account required)</li>
+            <li>We use Google AdSense to display relevant advertisements</li>
+            <li>We use Google Analytics to understand user behavior</li>
+            <li>You can clear your data at any time from your browser settings</li>
+          </ul>
+        </div>
+      )
+    },
+    'data-collection': {
+      title: 'Data We Collect',
+      content: (
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-on-surface">Information Collected Automatically</h3>
+          <div className="space-y-3">
+            <div className="bg-surface-container p-4 rounded-lg">
+              <h4 className="font-semibold text-primary mb-2">Game Statistics</h4>
+              <p className="text-sm text-on-surface-variant">Games played, win rate, current streak, max streak stored locally.</p>
+            </div>
+            <div className="bg-surface-container p-4 rounded-lg">
+              <h4 className="font-semibold text-primary mb-2">Usage Data</h4>
+              <p className="text-sm text-on-surface-variant">IP address, browser type, device type via Google Analytics.</p>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    'data-usage': {
+      title: 'How We Use Your Data',
+      content: (
+        <div className="space-y-4">
+          <div className="grid gap-3">
+            <div className="flex items-start gap-3 bg-surface-container p-3 rounded-lg">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Shield className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-on-surface">Game Functionality</h4>
+                <p className="text-sm text-on-surface-variant">Save progress and track statistics</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-surface-container p-3 rounded-lg">
+              <div className="p-2 bg-secondary/10 rounded-lg">
+                <Shield className="w-5 h-5 text-secondary" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-on-surface">Analytics</h4>
+                <p className="text-sm text-on-surface-variant">Understand user behavior to improve the game</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-surface-container p-3 rounded-lg">
+              <div className="p-2 bg-tertiary/10 rounded-lg">
+                <Shield className="w-5 h-5 text-tertiary" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-on-surface">Advertising</h4>
+                <p className="text-sm text-on-surface-variant">Display relevant advertisements</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    cookies: {
+      title: 'Cookies & Advertising',
+      content: (
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-on-surface">Google AdSense & Cookies</h3>
+          <p className="text-on-surface-variant">
+            PathWordle uses Google AdSense to display advertisements. Google and its partners may use cookies to serve ads.
+          </p>
+          <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg mt-4">
+            <p className="text-sm text-on-surface">
+              <strong>Opt out of personalized ads:</strong>{' '}
+              <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
+                Google Ad Settings
+              </a>
+            </p>
+          </div>
+        </div>
+      )
+    },
+    'user-rights': {
+      title: 'Your Privacy Rights',
+      content: (
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-on-surface">Your Rights</h3>
+          <div className="space-y-2">
+            <div className="flex items-start gap-3 bg-surface-container p-3 rounded-lg">
+              <div className="text-primary font-bold">1.</div>
+              <div>
+                <h4 className="font-semibold text-on-surface">Access and Deletion</h4>
+                <p className="text-sm text-on-surface-variant">Clear browser cache to delete all game data.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-surface-container p-3 rounded-lg">
+              <div className="text-primary font-bold">2.</div>
+              <div>
+                <h4 className="font-semibold text-on-surface">Opt-Out of Ads</h4>
+                <p className="text-sm text-on-surface-variant">Use browser extensions or Google's opt-out tools.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full mx-4 p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Shield className="w-8 h-8 text-blue-600" />
-            隐私政策
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors"
-            aria-label="Close privacy policy"
-          >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/90 backdrop-blur-sm">
+      <div className="bg-surface-container rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="bg-surface-container-highest px-6 py-4 border-b border-surface-container-high flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-on-surface font-headline">Privacy Policy</h2>
+          <button onClick={onClose} className="p-2 hover:bg-surface-container-low rounded-lg">
             <X className="w-6 h-6" />
           </button>
         </div>
-
-        <div className="prose prose prose-lg max-w-none">
-          <div className="space-y-6">
-            <section>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-                🔒 我们收集的信息
-              </h3>
-              <div className="space-y-3 text-gray-700">
-                <div className="flex items-start gap-3 mb-4">
-                  <CheckCircle className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">游戏数据</h4>
-                    <p className="text-gray-600">
-                      我们收集的信息仅用于改善游戏体验和提供服务，包括：
-                    </p>
-                    <ul className="list-disc list-inside space-y-2 text-gray-600 ml-6">
-                      <li>游戏进度和统计数据</li>
-                      <li>成就解锁记录</li>
-                      <li>学习分析数据</li>
-                      <li>错误日志和性能指标</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 mb-4">
-                  <AlertTriangle className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">不收集的信息</h4>
-                    <p className="text-gray-600">
-                      我们<strong>不会</strong>收集以下类型的个人信息：
-                    </p>
-                    <ul className="list-disc list-inside space-y-2 text-gray-600 ml-6">
-                      <li>姓名、地址、联系方式</li>
-                      <li>生物识别数据</li>
-                      <li>精确地理位置</li>
-                      <li>财务或支付信息</li>
-                      <li>社交媒体账户信息</li>
-                      <li>政治观点或宗教信仰</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-                📋 信息使用
-              </h3>
-              <div className="space-y-3 text-gray-700">
-                <p className="mb-4">
-                  我们使用收集的信息来：
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 ml-6">
-                  <li>提供和改进游戏功能</li>
-                  <li>个性化用户体验</li>
-                  <li>生成游戏统计和分析</li>
-                  <li>防止作弊和滥用</li>
-                  <li>客户服务和技术支持</li>
-                </ul>
-              </div>
-            </section>
-
-            <section>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-                🔒 数据分享
-              </h3>
-              <div className="space-y-3 text-gray-700">
-                <p className="mb-4">
-                  我们可能会分享以下类型的数据：
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 ml-6">
-                      <li><strong>匿名统计数据：</strong>整体游戏趋势和成就率</li>
-                      <li><strong>聚合数据：</strong>不包含个人身份信息的人口统计数据</li>
-                      <li><strong>研究数据：</strong>经过去身份化处理的游戏行为研究</li>
-                    </ul>
-              </div>
-            </section>
-
-            <section>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-                📞 数据存储与安全
-              </h3>
-              <div className="space-y-3 text-gray-700">
-                <p className="mb-4">
-                  我们采取以下措施保护您的数据：
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 ml-6">
-                      <li><strong>数据加密：</strong>所有敏感数据传输使用SSL/TLS加密</li>
-                      <li><strong>访问控制：</strong>严格限制对用户数据的访问权限</li>
-                      <li><strong>定期备份：</strong>自动备份重要数据，防止意外丢失</li>
-                      <li><strong>数据最小化：</strong>只收集必要的游戏功能数据</li>
-                      <li><strong>安全审计：</strong>定期进行安全审计和漏洞扫描</li>
-                    </ul>
-              </div>
-            </section>
-
-            <section>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-                🕒 您的权利
-              </h3>
-              <div className="space-y-3 text-gray-700">
-                <p className="mb-4">
-                  作为PathWordle用户，您享有以下权利：
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 ml-6">
-                      <li><strong>访问权：</strong>随时访问、更正或删除您的个人数据</li>
-                      <li><strong>知情权：</strong>了解我们收集、使用和分享您的数据的方式</li>
-                      <li><strong>限制权：</strong>限制我们处理和使用您数据的方式和范围</li>
-                      <li><strong>投诉权：</strong>向相关监管机构投诉我们的数据处理行为</li>
-                      <li><strong>数据可携权：</strong>以结构化格式导出您的个人数据</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 pt-4 border-t border-gray-200">
-              <div className="text-center text-gray-500 text-sm">
-                <p className="mb-2">
-                  <FileText className="w-4 h-4 inline mr-1" />
-                  本隐私政策自2025年11月20日起生效
-                </p>
-                <p>
-                  如对本政策有任何疑问，请联系我们的客服团队。
-                </p>
-                <div className="flex justify-center gap-3 mt-6">
+        <div className="flex flex-1 overflow-hidden">
+          <div className="w-64 bg-surface-container-low border-r border-surface-container-high overflow-y-auto">
+            <nav className="p-4 space-y-2">
+              {sections.map((section) => {
+                const Icon = section.icon;
+                return (
                   <button
-                    onClick={() => window.location.href = 'mailto:privacy@pathwordle.com'}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    key={section.id}
+                    onClick={() => setActiveSection(section.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-left ${
+                      activeSection === section.id
+                        ? 'bg-primary text-on-primary'
+                        : 'hover:bg-surface-container text-on-surface-variant'
+                    }`}
                   >
-                    <AlertTriangle className="w-5 h-5" />
-                    联系客服
+                    <Icon className="w-5 h-5" />
+                    <span className="font-medium text-sm">{section.title}</span>
                   </button>
-                  <button
-                    onClick={onClose}
-                    className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
-                  >
-                    <X className="w-5 h-5" />
-                    关闭
-                  </button>
-                </div>
-              </div>
-            </div>
+                );
+              })}
+            </nav>
+          </div>
+          <div className="flex-1 overflow-y-auto p-6">
+            {content[activeSection as keyof typeof content]?.content}
           </div>
         </div>
       </div>

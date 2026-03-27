@@ -3,7 +3,6 @@ import { GridCell } from '../../../types/game';
 import HintPanel from '../../HintPanel';
 import Statistics from '../../Statistics';
 import Friends from '../../Friends';
-import Multiplayer from '../../Multiplayer';
 import ThemeSelector from '../../ThemeSelector';
 
 interface GamePanelsProps {
@@ -30,7 +29,6 @@ export const GamePanels = memo(({
   showStatistics,
   showLeaderboard,
   showFriends,
-  showMultiplayer,
   showThemeSelector,
   grid,
   currentPath,
@@ -76,13 +74,6 @@ export const GamePanels = memo(({
       {showFriends && (
         <div className="mb-8">
           <Friends compact={false} showActions={true} />
-        </div>
-      )}
-
-      {/* Multiplayer Panel */}
-      {showMultiplayer && (
-        <div className="mb-8">
-          <Multiplayer />
         </div>
       )}
 

@@ -9,11 +9,11 @@ const GuessHistory: React.FC<GuessHistoryProps> = ({ guesses }) => {
   const getFeedbackColor = (feedback: 'correct' | 'present' | 'absent') => {
     switch (feedback) {
       case 'correct':
-        return 'bg-green-500 text-white';
+        return 'bg-green-500 text-white border-green-600 border-b-4';
       case 'present':
-        return 'bg-yellow-500 text-white';
+        return 'bg-yellow-500 text-white border-yellow-600 border-b-4';
       case 'absent':
-        return 'bg-gray-400 text-white';
+        return 'bg-gray-400 text-white border-gray-500 border-b-4';
     }
   };
 

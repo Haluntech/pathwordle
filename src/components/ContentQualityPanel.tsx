@@ -104,7 +104,7 @@ const ContentQualityPanel: React.FC<ContentQualityPanelProps> = ({ isVisible, on
                   </ul>
                 </div>
               </div>
-            )}
+            </div>
           )}
 
           {activeTab === 'vocabulary' && (
@@ -151,7 +151,7 @@ const ContentQualityPanel: React.FC<ContentQualityPanelProps> = ({ isVisible, on
                   </div>
                 </div>
               </div>
-            )}
+            </div>
           )}
 
           {activeTab === 'strategies' && (
@@ -180,7 +180,7 @@ const ContentQualityPanel: React.FC<ContentQualityPanelProps> = ({ isVisible, on
                   </ul>
                 </div>
               </div>
-            )}
+            </div>
           )}
 
           {activeTab === 'patterns' && (
@@ -215,7 +215,7 @@ const ContentQualityPanel: React.FC<ContentQualityPanelProps> = ({ isVisible, on
                   </div>
                 </div>
               </div>
-            )}
+            </div>
           )}
         </div>
 
