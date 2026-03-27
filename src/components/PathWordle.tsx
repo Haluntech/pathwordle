@@ -574,31 +574,6 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode: initialGameMode = 'da
         onAction={(hookId, action) => console.log(`Hook ${hookId} action: ${action}`)}
       />
 
-      <div id="comments-container" className="max-w-5xl mx-auto w-full px-8 py-8 mt-auto border-t border-surface-container-high">
-        <h2 className="text-2xl font-bold text-on-surface mb-8 text-center uppercase tracking-wider font-headline">
-          Community Discussion
-        </h2>
-        <div className="bg-surface-container rounded-xl p-6 sm:p-10 shadow-sm">
-          <div id="giscus-container" className="giscus mx-auto">
-            {/* Placeholder text when Giscus is not configured */}
-            <div className="text-center text-on-surface-variant py-8">
-              <p className="mb-4">Comments powered by Giscus</p>
-              <p className="text-sm text-outline-variant">
-                To enable comments, configure your GitHub repository in the code.
-              </p>
-              <a
-                href="https://giscus.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-4 px-4 py-2 bg-primary text-on-primary rounded-lg hover:bg-primary-dim transition-colors text-sm font-medium"
-              >
-                Learn More
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Footer */}
       <Footer
         onShowPrivacy={() => setShowPrivacy(true)}
