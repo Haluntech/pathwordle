@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowForwardIos, WorkspacePremium, Bolt, HelpCircle, BarChart3, Settings, Star, ChevronDown, Zap, Target, Users } from './icons';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const LandingPage: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -63,6 +64,7 @@ const LandingPage: React.FC = () => {
             PathWordle
           </Link>
           <div className="flex items-center gap-6">
+            <LanguageSwitcher />
             <Link to="/game" className="text-on-surface-variant hover:text-secondary transition-colors duration-300 scale-95 active:scale-90 transition-transform">
               <HelpCircle className="w-6 h-6" />
             </Link>
