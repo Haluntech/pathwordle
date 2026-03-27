@@ -1,8 +1,14 @@
 import React, { useState, lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
 import ThemeProvider from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { DifficultyConfig } from './config/difficulties';
+import LandingPage from './components/LandingPage';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
+import About from './components/About';
+import Contact from './components/Contact';
 
 // Lazy load the main game component for better performance
 const PathWordle = lazy(() => import('./components/PathWordle'));
@@ -45,33 +51,60 @@ function App() {
   return (
     <ErrorBoundary onError={handleError}>
       <LanguageProvider>
-          <ThemeProvider>
-          <div className="relative min-h-screen" role="application" aria-label="PathWordle Game">
-        {/* Skip to main content link for accessibility */}
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
+        <ThemeProvider>
+          <Router>
+            <div className="relative min-h-screen" role="application" aria-label="PathWordle Game">
+              {/* Skip to main content link for accessibility */}
+              <a href="#main-content" className="skip-link">
+                Skip to main content
+              </a>
 
-        <ErrorBoundary>
-          <Suspense fallback={<GameLoader />}>
-            <PathWordle gameMode={gameMode} difficulty={difficulty} onModeChange={handleModeChange} />
-          </Suspense>
-        </ErrorBoundary>
+              <Suspense fallback={<GameLoader />}>
+                <Routes>
+                  {/* Landing Page */}
+                  <Route path="/" element={<LandingPage />} />
 
-        {/* Difficulty Dialog */}
-        <ErrorBoundary>
-          <Suspense fallback={<div />}>
-            <DifficultyDialog
-              isOpen={showDifficultyDialog}
-              onClose={() => setShowDifficultyDialog(false)}
-              selectedDifficulty={difficulty}
-              onDifficultySelect={handleDifficultyChange}
-              gameMode={gameMode}
-            />
-          </Suspense>
-        </ErrorBoundary>
-      </div>
-      </ThemeProvider>
+                  {/* Game Page */}
+                  <Route
+                    path="/game"
+                    element={
+                      <PathWordle
+                        gameMode={gameMode}
+                        difficulty={difficulty}
+                        onModeChange={handleModeChange}
+                      />
+                    }
+                  />
+
+                  {/* Static Pages */}
+                  <Route path="/privacy" element={<PrivacyPolicy isOpen={true} onClose={() => window.location.href = '/'} />} />
+                  <Route path="/terms" element={<TermsOfService isOpen={true} onClose={() => window.location.href = '/'} />} />
+                  <Route path="/about" element={<About isOpen={true} onClose={() => window.location.href = '/'} />} />
+                  <Route path="/contact" element={<Contact isOpen={true} onClose={() => window.location.href = '/'} />} />
+
+                  {/* Redirect old paths */}
+                  <Route path="/play" element={<Navigate to="/game" replace />} />
+
+                  {/* Fallback - redirect to home */}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Suspense>
+
+              {/* Difficulty Dialog - Global */}
+              <ErrorBoundary>
+                <Suspense fallback={<div />}>
+                  <DifficultyDialog
+                    isOpen={showDifficultyDialog}
+                    onClose={() => setShowDifficultyDialog(false)}
+                    selectedDifficulty={difficulty}
+                    onDifficultySelect={handleDifficultyChange}
+                    gameMode={gameMode}
+                  />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+          </Router>
+        </ThemeProvider>
       </LanguageProvider>
     </ErrorBoundary>
   );
