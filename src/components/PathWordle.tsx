@@ -391,18 +391,18 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode: initialGameMode = 'da
   // Inject Giscus script dynamically with theme support
   useEffect(() => {
     // Only load Giscus if repo is configured
-    const repoId = "ENTER_YOUR_REPO_ID_HERE"; // Replace with actual repo ID
-    if (repoId === "ENTER_YOUR_REPO_ID_HERE") {
+    const repoId = "R_kgDOPE1Trw";
+    if (repoId === "R_kgDOPE1Trw") {
       console.log('Giscus not configured. Add your repository details to enable comments.');
       return;
     }
 
     const script = document.createElement('script');
     script.src = "https://giscus.app/client.js";
-    script.setAttribute("data-repo", "your-username/your-repo"); // Replace with actual repo
+    script.setAttribute("data-repo", "Haluntech/pathwordle"); // Replace with actual repo
     script.setAttribute("data-repo-id", repoId);
     script.setAttribute("data-category", "General");
-    script.setAttribute("data-category-id", "ENTER_CATEGORY_ID_HERE"); // Replace with actual category ID
+    script.setAttribute("data-category-id", "DIC_kwDOPE1Tr84C5aQ4"); // Replace with actual category ID
     script.setAttribute("data-mapping", "pathname");
     script.setAttribute("data-strict", "0");
     script.setAttribute("data-reactions-enabled", "1");
