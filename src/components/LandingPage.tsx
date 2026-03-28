@@ -1,56 +1,60 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowForwardIos, WorkspacePremium, Bolt, HelpCircle, BarChart3, Settings, Star, ChevronDown, Zap, Target, Users } from './icons';
+import { useTranslation } from 'react-i18next';
+import { ArrowForwardIos, WorkspacePremium, Bolt, HelpCircle, BarChart3, Settings, Star, ChevronDown, Zap, Target, Users, GameController } from './icons';
 import LanguageSwitcher from './LanguageSwitcher';
 
 const LandingPage: React.FC = () => {
+  const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
-  
+
+  // Use i18n for steps
   const steps = [
     {
       number: 1,
-      title: 'Connect Letters',
-      description: 'Click adjacent letters on the 6×6 grid to build your path. You can connect horizontally, vertically, or diagonally.',
+      title: t('landing.step1Title'),
+      description: t('landing.step1Desc'),
       icon: '🔗'
     },
     {
       number: 2,
-      title: 'Form Your Word',
-      description: 'Create a path that spells a 5-letter word. The letters must be connected in sequence.',
+      title: t('landing.step2Title'),
+      description: t('landing.step2Desc'),
       icon: '📝'
     },
     {
       number: 3,
-      title: 'Submit & Discover',
-      description: 'Submit your guess and get color-coded feedback. Green = correct position, Yellow = wrong position.',
+      title: t('landing.step3Title'),
+      description: t('landing.step3Desc'),
       icon: '✨'
     },
     {
       number: 4,
-      title: 'Master the Grid',
-      description: 'Use logic and strategy to guess the hidden word in 6 attempts or less. Good luck!',
+      title: t('landing.step4Title'),
+      description: t('landing.step4Desc'),
       icon: '🏆'
     }
   ];
 
+  // Use i18n for testimonials
   const testimonials = [
     {
-      name: 'Sarah Chen',
-      role: 'Word Game Enthusiast',
-      content: 'PathWordle is amazing! The path mechanic adds a whole new layer of strategy. My new daily addiction.',
+      name: t('landing.testimonial1Name'),
+      role: t('landing.testimonial1Role'),
+      content: t('landing.testimonial1Content'),
       rating: 5
     },
     {
-      name: 'Marcus Johnson',
-      role: 'Puzzle Lover',
-      content: 'Finally a word game that actually challenges you. The spatial thinking required is brilliant!',
+      name: t('landing.testimonial2Name'),
+      role: t('landing.testimonial2Role'),
+      content: t('landing.testimonial2Content'),
       rating: 5
     },
     {
-      name: 'Emma Williams',
-      role: 'Casual Gamer',
-      content: 'Perfect for my morning coffee routine. Simple to learn, hard to master. Love the daily challenges!',
+      name: t('landing.testimonial3Name'),
+      role: t('landing.testimonial3Role'),
+      content: t('landing.testimonial3Content'),
       rating: 5
     }
   ];
@@ -65,15 +69,13 @@ const LandingPage: React.FC = () => {
           </Link>
           <div className="flex items-center gap-6">
             <LanguageSwitcher />
-            <Link to="/game" className="text-on-surface-variant hover:text-secondary transition-colors duration-300 scale-95 active:scale-90 transition-transform">
-              <HelpCircle className="w-6 h-6" />
+            <Link
+              to="/game"
+              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dim text-on-primary-container rounded-lg transition-all duration-300 scale-95 active:scale-90 transition-transform font-medium text-sm"
+            >
+              <GameController className="w-5 h-5" />
+              <span>{t('landing.startPlaying')}</span>
             </Link>
-            <button className="text-on-surface-variant hover:text-secondary transition-colors duration-300 scale-95 active:scale-90 transition-transform">
-              <BarChart3 className="w-6 h-6" />
-            </button>
-            <button className="text-on-surface-variant hover:text-secondary transition-colors duration-300 scale-95 active:scale-90 transition-transform">
-              <Settings className="w-6 h-6" />
-            </button>
           </div>
         </div>
         <div className="bg-surface-container-low h-[1px] w-full"></div>
@@ -90,36 +92,36 @@ const LandingPage: React.FC = () => {
           {/* Hero Content */}
           <div className="lg:col-span-7 flex flex-col space-y-12">
             <div className="space-y-4">
-              <motion.h1 
+              <motion.h1
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
                 className="font-headline font-black text-7xl md:text-8xl tracking-tighter text-on-surface leading-none"
               >
-                Path<span className="text-secondary italic drop-shadow-[0_0_15px_rgba(249,226,129,0.5)]">Wordle</span>
+                {t('landing.title')}
               </motion.h1>
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
                 className="font-body text-on-surface-variant text-xl max-w-md font-light leading-relaxed"
               >
-                Forge a trail of logic through the grid. Connect letters, bridge gaps, and illuminate the daily path.
+                {t('landing.tagline')}
               </motion.p>
             </div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
               className="relative group max-w-sm"
             >
               <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-              <Link 
+              <Link
                 to="/game"
                 className="relative w-full py-6 px-10 bg-primary bg-gradient-to-tr from-primary to-primary-container rounded-xl flex items-center justify-between group-hover:translate-y-[-2px] transition-all duration-300"
               >
-                <span className="font-headline font-bold text-2xl uppercase tracking-widest text-on-primary-container">PLAY TODAY</span>
+                <span className="font-headline font-bold text-2xl uppercase tracking-widest text-on-primary-container">{t('landing.playToday')}</span>
                 <ArrowForwardIos className="w-8 h-8 text-on-primary-container" />
               </Link>
             </motion.div>
@@ -160,14 +162,14 @@ const LandingPage: React.FC = () => {
                 <Bolt className="w-16 h-16 text-secondary opacity-30" />
               </div>
               <h3 className="font-headline font-bold text-xs uppercase tracking-[0.3em] text-secondary mb-6">
-                DAILY CHALLENGE
+                {t('landing.dailyChallenge')}
               </h3>
               <div className="flex items-end justify-between mb-8">
                 <div className="space-y-1">
                   <span className="font-headline font-bold text-5xl text-on-surface">
                     0<span className="text-surface-container-highest">/</span>5
                   </span>
-                  <p className="font-body text-on-surface-variant text-sm font-medium">words completed</p>
+                  <p className="font-body text-on-surface-variant text-sm font-medium">{t('landing.wordsCompleted')}</p>
                 </div>
               </div>
               <div className="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden flex gap-1">
@@ -179,36 +181,36 @@ const LandingPage: React.FC = () => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4">
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="bg-surface-container-low p-6 rounded-xl flex flex-col justify-between cursor-pointer"
               >
                 <span className="font-headline font-bold text-xs uppercase tracking-widest text-on-tertiary-fixed-variant">
-                  Games Played
+                  {t('landing.gamesPlayed')}
                 </span>
                 <span className="font-headline font-medium text-4xl text-on-surface">128</span>
               </motion.div>
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="bg-surface-container-low p-6 rounded-xl flex flex-col justify-between cursor-pointer"
               >
                 <span className="font-headline font-bold text-xs uppercase tracking-widest text-on-tertiary-fixed-variant">
-                  Win Rate
+                  {t('landing.winRate')}
                 </span>
                 <span className="font-headline font-medium text-4xl text-primary">
                   94<span className="text-xl">%</span>
                 </span>
               </motion.div>
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="col-span-2 bg-surface-container-low p-6 rounded-xl flex items-center justify-between cursor-pointer"
               >
                 <div>
                   <span className="font-headline font-bold text-xs uppercase tracking-widest text-on-tertiary-fixed-variant block mb-1">
-                    Current Streak
+                    {t('landing.currentStreak')}
                   </span>
                   <span className="font-headline font-medium text-4xl text-on-surface">
-                    12 <span className="text-sm font-body font-normal text-on-surface-variant">days</span>
+                    12 <span className="text-sm font-body font-normal text-on-surface-variant">{t('landing.days')}</span>
                   </span>
                 </div>
                 <div className="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center">
@@ -227,8 +229,8 @@ const LandingPage: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="font-headline font-bold text-4xl text-on-surface mb-4">How to Play</h2>
-            <p className="font-body text-on-surface-variant text-lg">Master the grid in 4 simple steps</p>
+            <h2 className="font-headline font-bold text-4xl text-on-surface mb-4">{t('landing.howToPlay')}</h2>
+            <p className="font-body text-on-surface-variant text-lg">{t('landing.howToPlaySubtitle')}</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -260,8 +262,8 @@ const LandingPage: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="font-headline font-bold text-4xl text-on-surface mb-4">What Players Say</h2>
-            <p className="font-body text-on-surface-variant text-lg">Join thousands of word puzzle enthusiasts</p>
+            <h2 className="font-headline font-bold text-4xl text-on-surface mb-4">{t('landing.testimonials')}</h2>
+            <p className="font-body text-on-surface-variant text-lg">{t('landing.testimonialsSubtitle')}</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -298,18 +300,18 @@ const LandingPage: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="font-headline font-bold text-4xl text-on-surface mb-4">Why PathWordle?</h2>
-            <p className="font-body text-on-surface-variant text-lg">Features that make us different</p>
+            <h2 className="font-headline font-bold text-4xl text-on-surface mb-4">{t('landing.features')}</h2>
+            <p className="font-body text-on-surface-variant text-lg">{t('landing.featuresSubtitle')}</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { icon: '🎯', title: 'Strategic Gameplay', desc: 'Path mechanics add spatial reasoning to classic word puzzles' },
-              { icon: '📅', title: 'Daily Challenges', desc: 'New puzzle every day. Compete with friends worldwide' },
-              { icon: '💡', title: 'Smart Hints', desc: 'AI-powered suggestions when you need a helping hand' },
-              { icon: '📊', title: 'Track Progress', desc: 'Detailed statistics and achievements to track your journey' },
-              { icon: '🌙', title: 'Dark Mode', desc: 'Beautiful Material Design 3 interface with light/dark themes' },
-              { icon: '🆓', title: 'Forever Free', desc: 'No ads, no subscriptions. Just pure puzzle enjoyment' }
+              { icon: '🎯', title: t('landing.feature1Title'), desc: t('landing.feature1Desc') },
+              { icon: '📅', title: t('landing.feature2Title'), desc: t('landing.feature2Desc') },
+              { icon: '💡', title: t('landing.feature3Title'), desc: t('landing.feature3Desc') },
+              { icon: '📊', title: t('landing.feature4Title'), desc: t('landing.feature4Desc') },
+              { icon: '🌙', title: t('landing.feature5Title'), desc: t('landing.feature5Desc') },
+              { icon: '🆓', title: t('landing.feature6Title'), desc: t('landing.feature6Desc') }
             ].map((feature, index) => (
               <motion.div
                 key={index}
@@ -335,15 +337,15 @@ const LandingPage: React.FC = () => {
           viewport={{ once: true }}
           className="text-center py-16"
         >
-          <h2 className="font-headline font-black text-5xl text-on-surface mb-6">Ready to Play?</h2>
+          <h2 className="font-headline font-black text-5xl text-on-surface mb-6">{t('landing.readyToPlay')}</h2>
           <p className="font-body text-on-surface-variant text-xl mb-8 max-w-2xl mx-auto">
-            Join thousands of players already mastering the grid. Your daily word puzzle adventure awaits!
+            {t('landing.readyToPlayDesc')}
           </p>
-          <Link 
+          <Link
             to="/game"
             className="inline-flex items-center gap-3 px-12 py-6 bg-primary text-on-primary-container rounded-xl font-headline font-bold text-xl uppercase tracking-widest hover:bg-primary-dim transition-all hover:scale-105"
           >
-            Start Playing
+            {t('landing.startPlaying')}
             <ArrowForwardIos className="w-6 h-6" />
           </Link>
         </motion.section>
@@ -353,14 +355,14 @@ const LandingPage: React.FC = () => {
       <footer className="bg-background py-8 mt-auto flex flex-col md:flex-row justify-between items-center px-8 w-full border-t border-surface-container-high">
         <div className="mb-4 md:mb-0">
           <span className="font-body text-sm font-medium tracking-tight text-primary drop-shadow-[0_0_8px_rgba(175,244,166,0.3)]">
-            © 2026 PathWordle. Luminous Logic Engine.
+            {t('footer.copyright')}
           </span>
         </div>
         <div className="flex gap-8">
-          <Link to="/privacy" className="font-body text-sm font-medium tracking-tight text-gray-500 hover:text-white transition-colors opacity-80 hover:opacity-100">Privacy</Link>
-          <Link to="/terms" className="font-body text-sm font-medium tracking-tight text-gray-500 hover:text-white transition-colors opacity-80 hover:opacity-100">Terms</Link>
-          <Link to="/about" className="font-body text-sm font-medium tracking-tight text-gray-500 hover:text-white transition-colors opacity-80 hover:opacity-100">About</Link>
-          <Link to="/contact" className="font-body text-sm font-medium tracking-tight text-gray-500 hover:text-white transition-colors opacity-80 hover:opacity-100">Support</Link>
+          <Link to="/privacy" className="font-body text-sm font-medium tracking-tight text-on-surface-variant hover:text-on-surface transition-colors opacity-80 hover:opacity-100">{t('footer.privacy')}</Link>
+          <Link to="/terms" className="font-body text-sm font-medium tracking-tight text-on-surface-variant hover:text-on-surface transition-colors opacity-80 hover:opacity-100">{t('footer.terms')}</Link>
+          <Link to="/about" className="font-body text-sm font-medium tracking-tight text-on-surface-variant hover:text-on-surface transition-colors opacity-80 hover:opacity-100">{t('footer.about')}</Link>
+          <Link to="/contact" className="font-body text-sm font-medium tracking-tight text-on-surface-variant hover:text-on-surface transition-colors opacity-80 hover:opacity-100">{t('footer.support')}</Link>
         </div>
       </footer>
     </div>
