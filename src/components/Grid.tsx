@@ -75,7 +75,7 @@ const Grid: React.FC<GridProps> = ({ grid, onCellClick }) => {
 
   return (
     <div
-      className="grid grid-cols-6 gap-2 sm:gap-3 p-4 sm:p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/60 mx-auto"
+      className="grid grid-cols-6 gap-2 sm:gap-3 p-4 sm:p-6 grid-container backdrop-blur-sm"
       role="grid"
       aria-label="Game board letters"
       aria-describedby="grid-description"
