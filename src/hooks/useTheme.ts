@@ -463,7 +463,7 @@ const seasonalThemes: SeasonalTheme[] = [
 ];
 
 const defaultPreferences: UserThemePreferences = {
-  currentTheme: 'light-default',
+  currentTheme: 'dark-default', // Default to dark theme
   autoSwitch: {
     enabled: false,
     lightTheme: 'light-default',
@@ -511,6 +511,11 @@ export const useTheme = () => {
       } catch (error) {
         console.error('Error loading theme preferences:', error);
       }
+    } else {
+      // No saved preferences - check system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultTheme = prefersDark ? 'dark-default' : 'light-default';
+      setPreferences(prev => ({ ...prev, currentTheme: defaultTheme }));
     }
 
     const savedCustomization = localStorage.getItem('themeCustomization');
@@ -598,6 +603,13 @@ export const useTheme = () => {
     if (!currentTheme) return;
 
     const root = document.documentElement;
+
+    // Apply dark class for Tailwind
+    if (currentTheme.type === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
 
     // Apply CSS custom properties
     Object.entries(currentTheme.colors).forEach(([key, value]) => {

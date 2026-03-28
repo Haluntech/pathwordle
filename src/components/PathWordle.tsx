@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, memo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePathWordle } from '../hooks/usePathWordle';
 import { useStatistics } from '../hooks/useStatistics';
+import { useThemeContext } from '../contexts/ThemeContext';
 import Grid from './Grid';
 import GameResult from './GameResult';
 import Statistics from './Statistics';
@@ -55,7 +56,7 @@ const TopAppBar = memo(({
   onShowSettings,
   gameMode,
   onModeChange,
-  isDarkMode,
+  isDarkTheme,
   onToggleTheme,
   onShowHints
 }: {
@@ -64,7 +65,7 @@ const TopAppBar = memo(({
   onShowSettings: () => void;
   gameMode: 'daily' | 'practice';
   onModeChange: (mode: 'daily' | 'practice') => void;
-  isDarkMode: boolean;
+  isDarkTheme: boolean;
   onToggleTheme: () => void;
   onShowHints: () => void;
 }) => {
@@ -100,13 +101,13 @@ const TopAppBar = memo(({
           <button
             onClick={onToggleTheme}
             className="text-on-surface-variant hover:text-secondary hover:bg-secondary/10 p-2 rounded-lg transition-all duration-300 cursor-pointer scale-95 active:scale-90 transition-transform"
-            aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+            aria-label={`Switch to ${isDarkTheme ? 'light' : 'dark'} mode`}
           >
-            {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+            {isDarkTheme ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
           </button>
           {/* Tooltip */}
           <div className="absolute top-full right-0 mt-2 px-3 py-1.5 bg-surface-container-highest rounded-lg text-xs font-medium text-on-surface whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
-            {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            {isDarkTheme ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           </div>
         </div>
 
@@ -249,13 +250,13 @@ GameActionButtons.displayName = 'GameActionButtons';
 
 const PathWordle: React.FC<PathWordleProps> = ({ gameMode: initialGameMode = 'daily', difficulty = 'medium', onModeChange }) => {
 
-  // State for game mode and theme
+  // State for game mode
   const [gameMode, setGameMode] = useState<'daily' | 'practice'>(initialGameMode);
-  const [isDarkMode, setIsDarkMode] = useState(true);
 
   // Core hooks
   const { gameState, selectCell, submitGuess, clearPath, resetGame, canSubmit } = usePathWordle(gameMode);
   const { recordGame, getNextAchievement, clearNewAchievements, statistics } = useStatistics();
+  const { isDarkTheme, setTheme, currentTheme } = useThemeContext();
 
   // State hooks
   const [error, setError] = useState<string | null>(null);
@@ -269,47 +270,11 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode: initialGameMode = 'da
   const [gameStartTime, setGameStartTime] = useState<number>(Date.now());
   const [currentAchievement, setCurrentAchievement] = useState<any>(null);
 
-  // Theme toggle handler
+  // Theme toggle handler - use ThemeProvider's theme system
   const handleToggleTheme = useCallback(() => {
-    setIsDarkMode(prev => {
-      const newValue = !prev;
-      // Toggle dark class on HTML element
-      if (newValue) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.style.backgroundColor = '#0e0e0f';
-        document.documentElement.style.color = '#ffffff';
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.style.backgroundColor = '#ffffff';
-        document.documentElement.style.color = '#111827';
-      }
-      return newValue;
-    });
-  }, []);
-
-  // Initialize theme on mount
-  useEffect(() => {
-    // Check for saved theme preference or default to dark
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
-      setIsDarkMode(false);
-      document.documentElement.classList.remove('dark');
-      document.documentElement.style.backgroundColor = '#ffffff';
-      document.documentElement.style.color = '#111827';
-    } else {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-      document.documentElement.style.backgroundColor = '#0e0e0f';
-      document.documentElement.style.color = '#ffffff';
-    }
-  }, []);
-
-  // Save theme preference when it changes
-  useEffect(() => {
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
+    const newTheme = isDarkTheme ? 'light-default' : 'dark-default';
+    setTheme(newTheme);
+  }, [isDarkTheme, setTheme]);
 
   // Mode change handler
   const handleModeChange = useCallback((newMode: 'daily' | 'practice') => {
@@ -411,7 +376,7 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode: initialGameMode = 'da
     script.setAttribute("data-reactions-enabled", "1");
     script.setAttribute("data-emit-metadata", "0");
     script.setAttribute("data-input-position", "top");
-    script.setAttribute("data-theme", isDarkMode ? "dark" : "light");
+    script.setAttribute("data-theme", isDarkTheme ? "dark" : "light");
     script.setAttribute("data-lang", "en");
     script.setAttribute("data-loading", "lazy");
     script.crossOrigin = "anonymous";
@@ -427,7 +392,7 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode: initialGameMode = 'da
         commentsContainer.removeChild(script);
       }
     };
-  }, [isDarkMode]);
+  }, [isDarkTheme]);
 
   // Validate game state
   useEffect(() => {
@@ -492,7 +457,7 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode: initialGameMode = 'da
         onShowSettings={() => {}}
         gameMode={gameMode}
         onModeChange={handleModeChange}
-        isDarkMode={isDarkMode}
+        isDarkTheme={isDarkTheme}
         onToggleTheme={handleToggleTheme}
         onShowHints={() => setShowHints(true)}
       />
