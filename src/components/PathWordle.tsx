@@ -390,19 +390,22 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode: initialGameMode = 'da
 
   // Inject Giscus script dynamically with theme support
   useEffect(() => {
-    // Only load Giscus if repo is configured
+    // Giscus configuration
     const repoId = "R_kgDOPE1Trw";
-    if (repoId === "R_kgDOPE1Trw") {
+    const categoryId = "DIC_kwDOPE1Tr84C5aQ4";
+
+    // Check if Giscus is properly configured
+    if (!repoId || repoId.includes("xxxxx") || !categoryId || categoryId.includes("xxxxx")) {
       console.log('Giscus not configured. Add your repository details to enable comments.');
       return;
     }
 
     const script = document.createElement('script');
     script.src = "https://giscus.app/client.js";
-    script.setAttribute("data-repo", "Haluntech/pathwordle"); // Replace with actual repo
+    script.setAttribute("data-repo", "Haluntech/pathwordle");
     script.setAttribute("data-repo-id", repoId);
     script.setAttribute("data-category", "General");
-    script.setAttribute("data-category-id", "DIC_kwDOPE1Tr84C5aQ4"); // Replace with actual category ID
+    script.setAttribute("data-category-id", categoryId);
     script.setAttribute("data-mapping", "pathname");
     script.setAttribute("data-strict", "0");
     script.setAttribute("data-reactions-enabled", "1");
@@ -553,6 +556,16 @@ const PathWordle: React.FC<PathWordleProps> = ({ gameMode: initialGameMode = 'da
           </div>
         </div>
       )}
+
+      {/* Comments Section */}
+      <div id="comments-container" className="max-w-5xl mx-auto w-full px-8 py-8 mt-auto border-t border-surface-container-high">
+        <h2 className="text-2xl font-bold text-on-surface mb-8 text-center uppercase tracking-wider font-headline">
+          Community Discussion
+        </h2>
+        <div className="bg-surface-container rounded-xl p-6 sm:p-10 shadow-sm">
+          <div id="giscus-container" className="giscus mx-auto" />
+        </div>
+      </div>
 
       {/* User Engagement Hooks */}
       <UserEngagementHooks
