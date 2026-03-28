@@ -47,6 +47,13 @@ export const Star: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
+export const GameController: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="6" width="20" height="12" rx="2"/>
+    <path d="M6 12h4m-2-2v4m10-2h2m-5-3v6"/>
+  </svg>
+);
+
 export const ChevronDown: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
     <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
